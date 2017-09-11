@@ -152,6 +152,7 @@ ADIS16405.freq     = ref.freq;             % IMU operation frequency [X Y Z] (Hz
 % ref dataset will be used to simulate IMU sensors.
 ADIS16405.t = ref.t;                       % IMU time vector
 dt = mean(diff(ADIS16405.t));              % IMU mean period
+                                           % 注意, 这里用 mean 主要是因为数值上求差分会差几个eps
 
 imu1 = imu_si_errors(ADIS16405, dt);       % Transform IMU manufacturer error units to SI units.
 
