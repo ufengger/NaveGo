@@ -154,7 +154,8 @@ else % double precision 默认 double 的精度
     I = eye(3);
     Z = zeros(3);
     
-    % Kalman matrices for later analysis
+    % Kalman matrices for later analysis 
+    % 矩阵全部按照列向量处理
     In = zeros(Mg, 6);         % Kalman filter innovations
     Pi = zeros(Mg, 441);       % Elements from a priori covariance matrices, Pi
     Pp = zeros(Mg, 441);       % Elements from a posteriori covariance matrices, Pp
@@ -186,11 +187,11 @@ lon_e(1) = double(gps.lon(1));
 
 DCMnb = euler2dcm([roll_e(1); pitch_e(1); yaw_e(1);]);
 DCMbn = DCMnb'; % 与 DCMnb 互为转置
-qua   = euler2qua([roll_e(1) pitch_e(1) yaw_e(1)]);
+qua   = euler2qua([roll_e(1) pitch_e(1) yaw_e(1)]); % converts from Euler angles to quaternions
 
 % Initialize Kalman filter matrices
-S.R  = diag([gps.stdv, gps.stdm].^2);
-S.Q  = diag([imu.arw, imu.vrw, imu.gpsd, imu.apsd].^2);
+S.R  = diag([gps.stdv, gps.stdm].^2);                   % 测量噪声
+S.Q  = diag([imu.arw, imu.vrw, imu.gpsd, imu.apsd].^2); % 过程噪声
 S.Pp = diag([imu.ini_align_err, gps.stdv, gps.std, imu.gb_fix, imu.ab_fix, imu.gb_drift, imu.ab_drift].^2);
 
 % UD filter matrices
