@@ -185,7 +185,7 @@ lat_e(1) = double(gps.lat(1));
 lon_e(1) = double(gps.lon(1));
 
 DCMnb = euler2dcm([roll_e(1); pitch_e(1); yaw_e(1);]);
-DCMbn = DCMnb';
+DCMbn = DCMnb'; % 与 DCMnb 互为转置
 qua   = euler2qua([roll_e(1) pitch_e(1) yaw_e(1)]);
 
 % Initialize Kalman filter matrices
