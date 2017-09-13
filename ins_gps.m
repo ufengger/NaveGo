@@ -95,8 +95,8 @@ function [ins_gps_e] = ins_gps(imu, gps, att_mode, precision)
 if nargin < 3, att_mode  = 'quaternion'; end
 if nargin < 4, precision = 'double'; end
 
-Mi = (max(size(imu.t)));
-Mg = (max(size(gps.t)));
+Mi = (max(size(imu.t))); % imu 的时间采样点个数
+Mg = (max(size(gps.t))); % gps 的时间采样点个数, 一般来说远远小于 Mi
 
 if strcmp(precision, 'single')  % single precision
 
@@ -138,7 +138,7 @@ if strcmp(precision, 'single')  % single precision
     vel_e(1,:) = single(gps.vel(1,:));    
     h_e(1)     = single(gps.h(1));
     
-else % double precision
+else % double precision 默认 double 的精度
     
     ti = (imu.t);
     tg = (gps.t);
@@ -170,7 +170,7 @@ else % double precision
     gb_fix   = imu.gb_fix';
     ab_fix   = imu.ab_fix';
     
-    % Initialize estimates at tti = 1
+    % Initialize estimates at tti = 1; 什么是 tti ?
     roll_e(1)  = imu.ini_align(1);
     pitch_e(1) = imu.ini_align(2);
     yaw_e(1)   = imu.ini_align(3);
