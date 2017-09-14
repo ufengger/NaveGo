@@ -144,6 +144,7 @@ else % double precision 默认 double 的精度
     tg = (gps.t);
     
     % Preallocate memory for estimates
+    % 每一个惯导采样点都要对 roll, pitch, yaw, vel, h 估计一次
     roll_e  = zeros (Mi, 1);
     pitch_e = zeros (Mi, 1);
     yaw_e   = zeros (Mi, 1);
@@ -180,6 +181,7 @@ else % double precision 默认 double 的精度
 end
 
 % Lat and lon cannot be set in single precision. They need full (double) precision.
+% 经纬度也和惯导采样点对应
 lat_e    = zeros (Mi,1);
 lon_e    = zeros (Mi,1);
 lat_e(1) = double(gps.lat(1));
@@ -205,7 +207,7 @@ B(1,:)  = [gb_fix', ab_fix', gb_drift', ab_drift'];
 i = 1;
 
 % GPS clock is the master clock
-for j = 2:Mg
+for j = 2:Mg                            % 5 Hz
     
     while (ti(i) <= tg(j))
         
@@ -219,7 +221,7 @@ for j = 2:Mg
         % Index for INS navigation update
         i = i + 1;
         
-        % INS period
+        % INS period, 100 Hz
         dti = ti(i) - ti(i-1);
         
         % Correct inertial sensors
@@ -259,7 +261,9 @@ for j = 2:Mg
     
     %% INNOVATIONS
     
-    [RM,RN] = radius(lat_e(i), precision);
+    [RM,RN] = radius(lat_e(i), precision); % cf. Sec 3.1.1
+                                           % RM is the meridian radius of curvature
+                                           % RN is the normal radius of curvature
     Tpr = diag([(RM + h_e(i)), (RN + h_e(i)) * cos(lat_e(i)), -1]);  % radians-to-meters
     
     % Innovations
