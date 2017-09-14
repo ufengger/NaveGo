@@ -233,7 +233,7 @@ for j = 2:Mg                            % 5 Hz
         omega_en_N = transportrate(lat_e(i-1), vel_e(i-1,1), vel_e(i-1,2), h_e(i-1));
         
         [qua_n, DCMbn_n, euler] = att_update(wb_corrected, DCMbn, qua, ...
-            omega_ie_N, omega_en_N, dti, att_mode);
+            omega_ie_N, omega_en_N, dti, att_mode); % DCMbn_n: updated body-to-nav DCM
         roll_e(i) = euler(1);
         pitch_e(i)= euler(2);
         yaw_e(i)  = euler(3);
@@ -265,10 +265,11 @@ for j = 2:Mg                            % 5 Hz
                                            % RM is the meridian radius of curvature
                                            % RN is the normal radius of curvature
     Tpr = diag([(RM + h_e(i)), (RN + h_e(i)) * cos(lat_e(i)), -1]);  % radians-to-meters
+                                                                     % cf. eq. (21f) 
     
     % Innovations
     zp = Tpr * ([lat_e(i); lon_e(i); h_e(i);] - [gps.lat(j); gps.lon(j); gps.h(j);]) ...
-        - (DCMbn_n * gps.larm);
+        - (DCMbn_n * gps.larm);         % 疑似错误, 似乎应该是 "+", cf. eq. (21e)
     
     zv = (vel_e(i,:) - gps.vel(j,:))';
     
@@ -276,7 +277,7 @@ for j = 2:Mg                            % 5 Hz
     
     %% KALMAN FILTER
     
-    % GPS period
+    % GPS period, 5 Hz
     dtg = tg(j) - tg(j-1);
     
     % Vector to update matrix F
