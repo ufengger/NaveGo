@@ -271,9 +271,10 @@ for j = 2:Mg                            % 5 Hz
     zp = Tpr * ([lat_e(i); lon_e(i); h_e(i);] - [gps.lat(j); gps.lon(j); gps.h(j);]) ...
         - (DCMbn_n * gps.larm);         % 疑似错误, 似乎应该是 "+", cf. eq. (21e)
     
-    zv = (vel_e(i,:) - gps.vel(j,:))';
+    zv = (vel_e(i,:) - gps.vel(j,:))';  % cf. eq. (21d)
     
-    z = [ zv' zp' ]';
+    z = [ zv' zp' ]';                   % cf. eq. (21c)
+                                        % the so called innovation vector 
     
     %% KALMAN FILTER
     
