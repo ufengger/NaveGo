@@ -200,7 +200,8 @@ imu2.ini_align = [ref.roll(1) ref.pitch(1) ref.yaw(1)];  % Initial attitude alig
 gps.stdm = [5, 5, 10];                 % GPS positions standard deviations [lat lon h] (meters)
 gps.stdv = 0.1 * KT2MS .* ones(1,3);   % GPS velocities standard deviations [Vn Ve Vd] (meters/s)
 gps.larm = zeros(3,1);                 % GPS lever arm [X Y Z] (meters)
-gps.freq = 5;                          % GPS operation frequency (Hz)
+% gps.freq = 5;                          % GPS operation frequency (Hz)
+gps.freq = 1;
 
 %% SIMULATE GPS
 
