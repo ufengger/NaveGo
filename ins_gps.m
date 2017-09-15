@@ -259,7 +259,7 @@ for j = 2:Mg                            % 5 Hz
         
     end
     
-    %% INNOVATIONS
+    %% INNOVATIONS, prepare for the input of Kalman filter
     
     [RM,RN] = radius(lat_e(i), precision); % cf. Sec 3.1.1
                                            % RM is the meridian radius of curvature
