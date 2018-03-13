@@ -13,7 +13,7 @@
 %   it under the terms of the GNU Lesser General Public License (LGPL)
 %   version 3 as published by the Free Software Foundation.
 %
-%   This program is distributed in the hope that it will be useful,
+%   This program is distributed in the hope that it will be useful,gps.stdm
 %   but WITHOUT ANY WARRANTY; without even the implied warranty of
 %   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 %   GNU Lesser General Public License for more details.
@@ -40,10 +40,12 @@
 % Revision D. October 2011. 
 % http://static.garmin.com/pumac/GPS_18x_Tech_Specs.pdf
 % 
-% Version: 010
-% Date:    2017/08/11
+% Version: 011
+% Date:    2017/11/08
 % Author:  Rodrigo Gonzalez <rodralez@frm.utn.edu.ar>
 % URL:     https://github.com/rodralez/navego
+
+% NOTE: NaveGo supposes that IMU is aligned with respect to body-frame as X-forward, Y-right, and Z-down.
 
 clc
 close all
@@ -73,9 +75,9 @@ PLOT      = 'ON';   % Plot results.
 if (~exist('GPS_DATA','var')),  GPS_DATA  = 'OFF'; end
 if (~exist('IMU1_DATA','var')), IMU1_DATA = 'OFF'; end
 if (~exist('IMU2_DATA','var')), IMU2_DATA = 'OFF'; end
-if (~exist('IMU1_INS','var')),  IMU1_INS = 'OFF'; end
-if (~exist('IMU2_INS','var')),  IMU2_INS = 'OFF'; end
-if (~exist('PLOT','var')),      PLOT     = 'OFF'; end
+if (~exist('IMU1_INS','var')),  IMU1_INS  = 'OFF'; end
+if (~exist('IMU2_INS','var')),  IMU2_INS  = 'OFF'; end
+if (~exist('PLOT','var')),      PLOT      = 'OFF'; end
 
 %% CONVERSION CONSTANTS
 
@@ -106,9 +108,9 @@ load ref.mat
 %      roll: Nx1 roll angles (radians).
 %     pitch: Nx1 pitch angles (radians).
 %       yaw: Nx1 yaw angle vector (radians).
-%        kn: 1x1 number of elements of time vector.
+%        kn: 1x1 number of elements of ref time vector.
 %     DCMnb: Nx9 Direct Cosine Matrix nav-to-body. Each row contains 
-%            the elements of one matrix ordered by columns as 
+%            the elements of one DCM matrix ordered by columns as 
 %            [a11 a21 a31 a12 a22 a32 a13 a23 a33].
 %      freq: sampling frequency (Hz).
 
@@ -122,19 +124,19 @@ load ref.mat
 %      arrw: 1x3 angle rate random walks (rad/s^2/root-Hz).
 %       vrw: 1x3 velocity random walks (m/s^2/root-Hz).
 %      vrrw: 1x3 velocity rate random walks (m/s^3/root-Hz).
-%      gstd: 1x3 gyros standard deviations (radians/s).
-%      astd: 1x3 accrs standard deviations (m/s^2).
+%    gb_std: 1x3 gyros standard deviations (radians/s).
+%    ab_std: 1x3 accrs standard deviations (m/s^2).
 %    gb_fix: 1x3 gyros static biases or turn-on biases (radians/s).
 %    ab_fix: 1x3 accrs static biases or turn-on biases (m/s^2).
 %  gb_drift: 1x3 gyros dynamic biases or bias instabilities (radians/s).
 %  ab_drift: 1x3 accrs dynamic biases or bias instabilities (m/s^2).
 %   gb_corr: 1x3 gyros correlation times (seconds).
 %   ab_corr: 1x3 accrs correlation times (seconds).
-%     gpsd : 1x3 gyros dynamic biases PSD (rad/s/root-Hz).
-%     apsd : 1x3 accrs dynamic biases PSD (m/s^2/root-Hz);
+%    gb_psd: 1x3 gyros dynamic biases PSD (rad/s/root-Hz).
+%    ab_psd: 1x3 accrs dynamic biases PSD (m/s^2/root-Hz);
 %      freq: 1x1 sampling frequency (Hz).
-% ini_align: 1x3 initial attitude at t(1).
-% ini_align_err: 1x3 initial attitude errors at t(1).
+% ini_align: 1x3 initial attitude at t(1), [roll pitch yaw] (rad).
+% ini_align_err: 1x3 initial attitude errors at t(1), [roll pitch yaw] (rad).
 
 ADIS16405.arw      = 2   .* ones(1,3);     % Angle random walks [X Y Z] (deg/root-hour)
 ADIS16405.arrw     = zeros(1,3);           % Angle rate random walks [X Y Z] (deg/root-hour/s)
@@ -191,15 +193,15 @@ imu2.ini_align = [ref.roll(1) ref.pitch(1) ref.yaw(1)];  % Initial attitude alig
 %       lon: Mx1 longitude (radians).
 %         h: Mx1 altitude (m).
 %       vel: Mx3 NED velocities (m/s).
-%       std: 1x3 position standard deviations (rad, rad, m).
-%      stdm: 1x3 position standard deviations (m, m, m).
-%      stdv: 1x3 velocity standard deviations (m/s).
+%       std: 1x3 position standard deviations, [lat lon h] (rad, rad, m).
+%      stdm: 1x3 position standard deviations, [lat lon h] (m, m, m).
+%      stdv: 1x3 velocity standard deviations, [Vn Ve Vd] (m/s).
 %      larm: 3x1 lever arm (x-right, y-fwd, z-down) (m).
 %      freq: 1x1 sampling frequency (Hz).
 
 gps.stdm = [5, 5, 10];                 % GPS positions standard deviations [lat lon h] (meters)
 gps.stdv = 0.1 * KT2MS .* ones(1,3);   % GPS velocities standard deviations [Vn Ve Vd] (meters/s)
-gps.larm = zeros(3,1);                 % GPS lever arm [X Y Z] (meters)
+gps.larm = zeros(3,1);                 % GPS lever arm from IMU to GPS, X-fwd, Y-right, Z-down (meters)
 gps.freq = 5;                          % GPS operation frequency (Hz)
 
 %% SIMULATE GPS
@@ -229,12 +231,12 @@ rng('shuffle')                  % Reset pseudo-random seed
 
 if strcmp(IMU1_DATA, 'ON')      % If simulation of IMU1 data is required ...
     
-    fprintf('NaveGo: generating IMU1 ACCR data... \n')
+    fprintf('NaveGo: simulating IMU1 ACCR data... \n')
     
     fb = acc_gen (ref, imu1);   % Generate acc in the body frame
     imu1.fb = fb;
     
-    fprintf('NaveGo: generating IMU1 GYRO data... \n')
+    fprintf('NaveGo: simulating IMU1 GYRO data... \n')
     
     wb = gyro_gen (ref, imu1);  % Generate gyro in the body frame
     imu1.wb = wb;
@@ -255,12 +257,12 @@ rng('shuffle')					% Reset pseudo-random seed
 
 if strcmp(IMU2_DATA, 'ON')      % If simulation of IMU2 data is required ...
     
-    fprintf('NaveGo: generating IMU2 ACCR data... \n')
+    fprintf('NaveGo: simulating IMU2 ACCR data... \n')
     
     fb = acc_gen (ref, imu2);   % Generate acc in the body frame
     imu2.fb = fb;
     
-    fprintf('NaveGo: generating IMU2 GYRO data... \n')
+    fprintf('NaveGo: simulating IMU2 GYRO data... \n')
     
     wb = gyro_gen (ref, imu2);  % Generate gyro in the body frame
     imu2.wb = wb;
@@ -274,6 +276,13 @@ else
     
     load imu2.mat
 end
+
+
+%% Print navigation time
+
+to = (ref.t(end) - ref.t(1));
+
+fprintf('\nNaveGo: navigation time is %.2f minutes or %.2f seconds. \n', (to/60), to)
 
 %% INS/GPS integration using IMU1
 
@@ -295,6 +304,7 @@ if strcmp(IMU1_INS, 'ON')
     
     % Guarantee that imu1.t(end-1) < gps.t(end) < imu1.t(end)
     gps1 = gps;
+    
     if (imu1.t(end) <= gps.t(end)),
         
         fgx  = find(gps.t < imu1.t(end), 1, 'last' );
@@ -340,6 +350,7 @@ if strcmp(IMU2_INS, 'ON')
     
     % Guarantee that imu2.t(end-1) < gps.t(end) < imu2.t(end)
     gps2 = gps;
+    
     if (imu2.t(end) <= gps.t(end)),
         
         fgx  = find(gps.t < imu2.t(end), 1, 'last' );
@@ -353,7 +364,7 @@ if strcmp(IMU2_INS, 'ON')
     
     % Execute INS/GPS integration
     % ---------------------------------------------------------------------
-    [imu2_e] = ins_gps(imu2, gps2, 'dcm', 'single');
+    [imu2_e] = ins_gps(imu2, gps2, 'quaternion', 'single');
     % ---------------------------------------------------------------------
     
     save imu2_e.mat imu2_e
@@ -373,12 +384,6 @@ end
 [imu1_ref, ref_1] = navego_interpolation (imu1_e, ref);
 [imu2_ref, ref_2] = navego_interpolation (imu2_e, ref);
 [gps_ref, ref_g]  = navego_interpolation (gps, ref);
-
-%% Print navigation time
-
-to = (ref.t(end) - ref.t(1));
-
-fprintf('\nNaveGo: navigation time is %.2f minutes or %.2f seconds. \n', (to/60), to)
 
 %% Print RMSE from IMU1
 
@@ -432,7 +437,7 @@ if (strcmp(PLOT,'ON'))
     % ATTITUDE ERRORS
     figure;
     subplot(311)
-    plot(imu1_e.t, (imu1_ref.roll-ref_1.roll).*R2D, '-b', imu2_e.t, (imu2_e.roll-ref_2.roll).*R2D, '-r');
+    plot(imu1_e.t, (imu1_ref.roll - ref_1.roll).*R2D, '-b', imu2_ref.t, (imu2_ref.roll - ref_2.roll).*R2D, '-r');
     hold on
     plot (gps.t, R2D.*sig3_rr(:,1), '--k', gps.t, -R2D.*sig3_rr(:,1), '--k' )
     ylabel('[deg]')
@@ -441,7 +446,7 @@ if (strcmp(PLOT,'ON'))
     title('ROLL ERROR');
     
     subplot(312)
-    plot(imu1_e.t, (imu1_ref.pitch-ref_1.pitch).*R2D, '-b', imu2_e.t, (imu2_e.pitch-ref_2.pitch).*R2D, '-r');
+    plot(imu1_e.t, (imu1_ref.pitch - ref_1.pitch).*R2D, '-b', imu2_ref.t, (imu2_ref.pitch - ref_2.pitch).*R2D, '-r');
     hold on
     plot (gps.t, R2D.*sig3_rr(:,2), '--k', gps.t, -R2D.*sig3_rr(:,2), '--k' )
     ylabel('[deg]')
@@ -450,7 +455,7 @@ if (strcmp(PLOT,'ON'))
     title('PITCH ERROR');
     
     subplot(313)
-    plot(imu1_e.t, (imu1_ref.yaw-ref_1.yaw).*R2D, '-b', imu2_e.t, (imu2_e.yaw-ref_2.yaw).*R2D, '-r');
+    plot(imu1_e.t, (imu1_ref.yaw - ref_1.yaw).*R2D, '-b', imu2_ref.t, (imu2_ref.yaw - ref_2.yaw).*R2D, '-r');
     hold on
     plot (gps.t, R2D.*sig3_rr(:,3), '--k', gps.t, -R2D.*sig3_rr(:,3), '--k' )
     ylabel('[deg]')
@@ -487,7 +492,6 @@ if (strcmp(PLOT,'ON'))
     plot(gps_ref.t, (gps_ref.vel(:,1) - ref_g.vel(:,1)), '-c');
     hold on
     plot(imu1_ref.t, (imu1_ref.vel(:,1) - ref_1.vel(:,1)), '-b', imu2_ref.t, (imu2_ref.vel(:,1) - ref_2.vel(:,1)), '-r');
-    hold on
     plot (gps.t, sig3_rr(:,4), '--k', gps.t, -sig3_rr(:,4), '--k' )
     xlabel('Time [s]')
     ylabel('[m/s]')
@@ -497,8 +501,7 @@ if (strcmp(PLOT,'ON'))
     subplot(312)
     plot(gps_ref.t, (gps_ref.vel(:,2) - ref_g.vel(:,2)), '-c');
     hold on
-    plot(imu1_ref.t, (imu1_ref.vel(:,2) - ref_1.vel(:,2)), '-b', imu2_ref.t, (imu2_ref.vel(:,2) - imu2_ref.vel(:,2)), '-r');
-    hold on
+    plot(imu1_ref.t, (imu1_ref.vel(:,2) - ref_1.vel(:,2)), '-b', imu2_ref.t, (imu2_ref.vel(:,2) - ref_2.vel(:,2)), '-r');
     plot (gps.t, sig3_rr(:,5), '--k', gps.t, -sig3_rr(:,5), '--k' )
     xlabel('Time [s]')
     ylabel('[m/s]')
@@ -508,8 +511,7 @@ if (strcmp(PLOT,'ON'))
     subplot(313)
     plot(gps_ref.t, (gps_ref.vel(:,3) - ref_g.vel(:,3)), '-c');
     hold on
-    plot(imu1_ref.t, (imu1_ref.vel(:,3) - imu1_ref.vel(:,3)), '-b', imu2_ref.t, (imu2_ref.vel(:,3) - imu2_ref.vel(:,3)), '-r');
-    hold on
+    plot(imu1_ref.t, (imu1_ref.vel(:,3) - ref_1.vel(:,3)), '-b', imu2_ref.t, (imu2_ref.vel(:,3) - ref_2.vel(:,3)), '-r');
     plot (gps.t, sig3_rr(:,6), '--k', gps.t, -sig3_rr(:,6), '--k' )
     xlabel('Time [s]')
     ylabel('[m/s]')
@@ -539,13 +541,14 @@ if (strcmp(PLOT,'ON'))
     legend('REF', 'GPS', 'IMU1', 'IMU2');
     title('ALTITUDE');
     
-    % POSITION ERRORS
-    % fh = @radicurv;
-    % [RNs,REs] = arrayfun(fh, lat_rs);
-    
+    % POSITION ERRORS    
     [RN,RE]  = radius(imu1_ref.lat, 'double');
-    LAT2M = RN + imu1_ref.h;
-    LON2M = (RE + imu1_ref.h).*cos(imu1_ref.lat);
+    LAT2M_1 = RN + imu1_ref.h;
+    LON2M_1 = (RE + imu1_ref.h).*cos(imu1_ref.lat);
+    
+    [RN,RE]  = radius(imu2_ref.lat, 'double');
+    LAT2M_2 = RN + imu2_ref.h;
+    LON2M_2 = (RE + imu2_ref.h).*cos(imu2_ref.lat);
     
     [RN,RE]  = radius(gps.lat, 'double');
     LAT2M_G = RN + gps.h;
@@ -559,10 +562,8 @@ if (strcmp(PLOT,'ON'))
     subplot(311)
     plot(gps_ref.t,  LAT2M_GR.*(gps_ref.lat - ref_g.lat), '-c')
     hold on
-    plot(imu1_ref.t, LAT2M.*(imu1_ref.lat - ref_1.lat), '-b')
-    hold on
-    plot(imu2_ref.t, LAT2M.*(imu2_ref.lat - ref_2.lat), '-r')
-    hold on
+    plot(imu1_ref.t, LAT2M_1.*(imu1_ref.lat - ref_1.lat), '-b')
+    plot(imu2_ref.t, LAT2M_2.*(imu2_ref.lat - ref_2.lat), '-r')
     plot (gps.t, LAT2M_G.*sig3_rr(:,7), '--k', gps.t, -LAT2M_G.*sig3_rr(:,7), '--k' )
     xlabel('Time [s]')
     ylabel('[m]')
@@ -570,12 +571,10 @@ if (strcmp(PLOT,'ON'))
     title('LATITUDE ERROR');
     
     subplot(312)
-    plot(gps_ref.t, LON2M_GR.*(gps_ref.lon - gps_ref.lon), '-c')
+    plot(gps_ref.t, LON2M_GR.*(gps_ref.lon - ref_g.lon), '-c')
     hold on
-    plot(imu1_ref.t, LON2M.*(imu1_ref.lon - ref_1.lon), '-b')
-    hold on
-    plot(imu2_ref.t, LON2M.*(imu2_ref.lon - ref_2.lon), '-r')
-    hold on
+    plot(imu1_ref.t, LON2M_1.*(imu1_ref.lon - ref_1.lon), '-b')
+    plot(imu2_ref.t, LON2M_2.*(imu2_ref.lon - ref_2.lon), '-r')
     plot(gps.t, LON2M_G.*sig3_rr(:,8), '--k', gps.t, -LON2M_G.*sig3_rr(:,8), '--k' )
     xlabel('Time [s]')
     ylabel('[m]')
@@ -583,16 +582,13 @@ if (strcmp(PLOT,'ON'))
     title('LONGITUDE ERROR');
     
     subplot(313)
-    plot(gps_ref.t, (gps_ref.h - gps_ref.h), '-c')
+    plot(gps_ref.t, (gps_ref.h - ref_g.h), '-c')
     hold on
     plot(imu1_ref.t, (imu1_ref.h - ref_1.h), '-b')
-    hold on
     plot(imu2_ref.t, (imu2_ref.h - ref_2.h), '-r')
-    hold on
     plot(gps.t, sig3_rr(:,9), '--k', gps.t, -sig3_rr(:,9), '--k' )
     xlabel('Time [s]')
     ylabel('[m]')
     legend('GPS', 'IMU1', 'IMU2', '3\sigma');
-    title('ALTITUDE ERROR');
-    
+    title('ALTITUDE ERROR');    
 end

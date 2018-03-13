@@ -20,17 +20,27 @@ Main features of NaveGo are:
 
 * Processing of a loosely-coupled integrated navigation system (INS/GPS).
 
-* Implementation of the Allan variance procedure to characterize inertial sensors' typical errors.
-
 * Simulation of inertial sensors and GPS.
 
+* Zero Velocity Update (ZUPT) detection algorithm.
+
+* Implementation of the Allan variance procedure to characterize inertial sensors' typical errors.
+
 ## How to cite this work
+
+We gently ask everyone using NaveGo in his/her research to add the following two cites to his/her papers:
+
+* (Gonzalez et al., 2017) R. Gonzalez, C.A. Catania, P. Dabove, J.C. Taffernaberry, and M. Piras. Model validation of an open-source framework for post-processing INS/GNSS systems. III International Conference on Geographical Information Systems Theory, Applications and Management (GISTAM 2017). Porto, Portugal. April 2017. [Download](http://www.scitepress.org/Papers/2017/63139/index.html).
+
+* (Gonzalez et al., 2015) R. Gonzalez, J.I. Giribet, and H.D. Patiño. NaveGo: a simulation framework for low-cost integrated navigation systems, Journal of Control Engineering and Applied Informatics, vol. 17, issue 2, pp. 110-120, 2015. [Download](http://ceai.srait.ro/index.php?journal=ceai&page=article&op=view&path%5B%5D=2478).
+
+An URL to NaveGo should be provided as the following cite:
 
 Rodrigo Gonzalez, Carlos Catania, and Paolo Dabove (2017). NaveGo: an open-source MATLAB/GNU-Octave toolbox for processing integrated navigation systems and performing inertial sensors profiling analysis. DOI: 10.5281/zenodo.841872. URL: https://github.com/rodralez/NaveGo/.
 
 ## Contributions
 
-We are looking for contributors for NaveGo! Since integrated navigation is a topic used in several fields as Geomatics, Geology, Mobile Mapping, Autonomous Driving, even Veterinary, we hope other communities than the navigation community compromise and contribute with this open-source project.
+We are looking for contributors for NaveGo! Since integrated navigation is a topic used in several fields as Geomatics, Geology, Mobile Mapping, Autonomous Driving, even Veterinary (yes, Veterinary!), we hope other communities than the navigation community compromise and contribute with this open-source project.
 
 You can contribute in many ways: 
 
@@ -49,7 +59,7 @@ The underlying mathematical model of NaveGo is based on two articles which are r
 
 * (Gonzalez et al., 2015a) R. Gonzalez, J.I. Giribet, and H.D. Patiño. An approach to benchmarking of loosely coupled low-cost navigation systems. Mathematical and Computer Modelling of Dynamical Systems, vol. 21, issue 3, pp. 272-287, 2015. [Link](http://www.tandfonline.com/doi/abs/10.1080/13873954.2014.952642).
 
-Other publications:
+Other publications related to the development of NaveGo:
 
 * (Gonzalez et al., 2017a) R. Gonzalez, E.M. Martinez, and P. Dabove. Assessment of Discrete Stochastic Models of MEMS Inertial Sensors by Using the Allan Variance. In the III International Conference on Sensors and Electronics Instrumentation Advances (SEIA' 2017), 20-22 September 2017, Moscow, Russia.
 
@@ -61,8 +71,6 @@ Other publications:
 Future features of NaveGo will be:
 
 * RTS smoother.
-
-* Zero Velocity Update (ZUPT).
 
 * Tightly-coupled INS/GPS. 
 
@@ -358,6 +366,16 @@ end
 
 ```
 
+### Print navigation time
+
+```matlab
+
+to = (ref.t(end) - ref.t(1));
+
+fprintf('\nNaveGo: navigation time is %.2f minutes or %.2f seconds. \n', (to/60), to)
+
+```
+
 ### INS/GPS integration using IMU1
 
 ```matlab
@@ -466,16 +484,6 @@ end
 [imu1_ref, ref_1] = navego_interpolation (imu1_e, ref);
 [imu2_ref, ref_2] = navego_interpolation (imu2_e, ref);
 [gps_ref, ref_g]  = navego_interpolation (gps, ref);
-
-```
-
-### Print navigation time
-
-```matlab
-
-to = (ref.t(end) - ref.t(1));
-
-fprintf('\nNaveGo: navigation time is %.2f minutes or %.2f seconds. \n', (to/60), to)
 
 ```
 
