@@ -19,34 +19,34 @@ function imu_si = imu_si_errors(imu, dt)
 % OUTPUT:
 %		imu_si: data structure with IMU error profile in SI units.
 %
-%   Copyright (C) 2014, Rodrigo Gonzalez, all rights reserved. 
-%     
-%   This file is part of NaveGo, an open-source MATLAB toolbox for 
+%   Copyright (C) 2014, Rodrigo Gonzalez, all rights reserved.
+%
+%   This file is part of NaveGo, an open-source MATLAB toolbox for
 %   simulation of integrated navigation systems.
-%     
+%
 %   NaveGo is free software: you can redistribute it and/or modify
-%   it under the terms of the GNU Lesser General Public License (LGPL) 
+%   it under the terms of the GNU Lesser General Public License (LGPL)
 %   version 3 as published by the Free Software Foundation.
-% 
+%
 %   This program is distributed in the hope that it will be useful,
 %   but WITHOUT ANY WARRANTY; without even the implied warranty of
 %   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 %   GNU Lesser General Public License for more details.
-% 
-%   You should have received a copy of the GNU Lesser General Public 
-%   License along with this program. If not, see 
+%
+%   You should have received a copy of the GNU Lesser General Public
+%   License along with this program. If not, see
 %   <http://www.gnu.org/licenses/>.
 %
-% Reference: 
-%			R. Gonzalez, J. Giribet, and H. Patiño. NaveGo: a 
-% simulation framework for low-cost integrated navigation systems, 
-% Journal of Control Engineering and Applied Informatics, vol. 17, 
+% Reference:
+%			R. Gonzalez, J. Giribet, and H. Patiño. NaveGo: a
+% simulation framework for low-cost integrated navigation systems,
+% Journal of Control Engineering and Applied Informatics, vol. 17,
 % issue 2, pp. 110-120, 2015. Eq. 9, 14, and 30.
 %
 % Version: 005
 % Date:    2017/11/01
 % Author:  Rodrigo Gonzalez <rodralez@frm.utn.edu.ar>
-% URL:     https://github.com/rodralez/navego 
+% URL:     https://github.com/rodralez/navego
 
 D2R = (pi/180);     % deg to rad
 G2MSS = 9.81;       % g to m/s^2
@@ -74,7 +74,7 @@ imu_si.gb_drift = imu.gb_drift .* D2R;             % deg/s -> rad/s;
 if (isinf(imu.gb_corr))
     imu_si.gb_psd = imu_si.gb_drift;  % rad/s (approximation)
 else
-    imu_si.gb_psd = imu_si.gb_drift .* sqrt(imu.gb_corr);  % rad/s/root-Hz; 
+    imu_si.gb_psd = imu_si.gb_drift .* sqrt(imu.gb_corr);  % rad/s/root-Hz;
 end
 
 if (isinf(imu.ab_corr))

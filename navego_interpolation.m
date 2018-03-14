@@ -28,32 +28,32 @@ D = max(size(data.t));
 R = max(size(ref.t));
 
 if (D > R)
-    
+
     method = 'nearest';
 else
-    
+
     method = 'linear';
 end
 
 %% Adjust reference structure before interpolating
 if (ref.t(1) < data.t(1))
-    
+
     fprintf('navego_interpolation: adjusting first element of ref ... \n')
-    
+
     idx  = find(ref.t >= data.t(1), 1, 'first' );
     if(isempty(idx))
         error('navego_interpolation: idx empty index.')
     end
-    
+
     ref.t   = ref.t  (idx:end);
     ref.lat = ref.lat(idx:end);
     ref.lon = ref.lon(idx:end);
     ref.h   = ref.h(  idx:end);
-    
+
     if (isfield(ref, 'vel'))
         ref.vel = ref.vel(idx:end, :);
     end
-    
+
     if (isfield(ref, 'roll'))
         ref.roll  = ref.roll (idx:end);
         ref.pitch = ref.pitch(idx:end);
@@ -62,24 +62,24 @@ if (ref.t(1) < data.t(1))
 end
 
 if (ref.t(end) > data.t(end))
-    
+
     fprintf('navego_interpolation: adjusting last element of ref... \n')
-    
+
     idx  = 1;
     fdx  = find(ref.t <= data.t(end), 1, 'last' );
     if(isempty(fdx))
         error('navego_interpolation: fdx empty index.')
     end
-    
+
     ref.t   = ref.t  (idx:fdx);
     ref.lat = ref.lat(idx:fdx);
     ref.lon = ref.lon(idx:fdx);
     ref.h   = ref.h  (idx:fdx);
-    
+
     if (isfield( ref, 'vel'))
         ref.vel = ref.vel(idx:fdx, :);
     end
-    
+
     if (isfield(ref, 'roll'))
         ref.roll  = ref.roll (idx:fdx);
         ref.pitch = ref.pitch(idx:fdx);
@@ -90,9 +90,9 @@ end
 %% Interpolate
 
 if (isfield(data, 'roll') & isfield(ref, 'roll'))  % If data is from INS/GPS solution...
-    
+
     fprintf('navego_interpolation: %s method to interpolate INS/GPS solution\n', method)
-    
+
     ref_i.t     = ref.t;
     ref_i.roll  = interp1(data.t, data.roll,  ref.t, method);
     ref_i.pitch = interp1(data.t, data.pitch, ref.t, method);
@@ -100,47 +100,47 @@ if (isfield(data, 'roll') & isfield(ref, 'roll'))  % If data is from INS/GPS sol
     ref_i.lat   = interp1(data.t, data.lat,   ref.t, method);
     ref_i.lon   = interp1(data.t, data.lon,   ref.t, method);
     ref_i.h     = interp1(data.t, data.h,     ref.t, method);
-    
+
     if (isfield(ref, 'vel') & isfield( data, 'vel'))
-        
+
         ref_i.vel = interp1(data.t, data.vel,   ref.t, method);
-        flag_vel = any(isnan(ref_i.vel));        
+        flag_vel = any(isnan(ref_i.vel));
     else
         flag_vel = logical(zeros(1,3));
     end
-    
+
     flag = any(isnan(ref_i.t)) | any(isnan(ref_i.roll)) | any(isnan(ref_i.pitch)) | any(isnan(ref_i.yaw)) |  ...
         any(isnan(ref_i.lat)) | any(isnan(ref_i.lon)) | any(isnan(ref_i.h)) | flag_vel;
-    
+
     % Test interpolated dataset
     if(flag)
-        
+
         error('navego_interpolation: NaN value in INS/GPS interpolated solution')
     end
-    
+
 else  % If dataset is from GPS-only solution...
-    
+
     fprintf('navego_interpolation: %s method to interpolate GPS-only solution\n', method)
-    
+
     ref_i.t   = ref.t;
     ref_i.lat = interp1(data.t, data.lat, ref.t, method);
     ref_i.lon = interp1(data.t, data.lon, ref.t, method);
     ref_i.h   = interp1(data.t, data.h,   ref.t, method);
-    
+
     if (isfield(ref, 'vel') & isfield( data, 'vel'))
-        
-        ref_i.vel = interp1(data.t, data.vel,   ref.t, method);        
-        flag_vel = any(isnan(ref_i.vel));        
+
+        ref_i.vel = interp1(data.t, data.vel,   ref.t, method);
+        flag_vel = any(isnan(ref_i.vel));
     else
         flag_vel = logical(zeros(1,3));
     end
-    
+
     flag = any(isnan(ref_i.t)) | any(isnan(ref_i.lat)) | any(isnan(ref_i.lon)) | ...
         any(isnan(ref_i.h)) | flag_vel;
-    
+
     % Test interpolated dataset
     if(flag)
-        
+
         error('navego_interpolation: NaN value in GPS-only interpolated solution')
     end
 end

@@ -51,18 +51,18 @@ if (~isinf(b_corr))
         a1 = exp(-beta);
         a2 = sigma * sqrt(1 - exp(-2*beta) );
 
-        b_noise = randn(N-1,1); 
-        
+        b_noise = randn(N-1,1);
+
         for j=2:N
             dbias_n(j, i) = a1 * dbias_n(j-1, i) + a2 .* b_noise(j-1);
         end
     end
-    
+
 % If not...
 else
     sigma = b_drift;
     bn = randn(M);
-    
+
     dbias_n = [sigma(1) .* bn(:,1), sigma(2) .* bn(:,2), sigma(3) .* bn(:,3)];
-    
+
 end

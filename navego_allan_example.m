@@ -1,4 +1,4 @@
-% navego_allan_example: example of how to implement the Allan variance 
+% navego_allan_example: example of how to implement the Allan variance
 % procedure with NaveGo functions.
 %
 %   Copyright (C) 2014, Rodrigo Gonzalez, all rights reserved.
@@ -21,12 +21,12 @@
 %
 % References:
 %
-%       Sensonor AS. Sensonor STIM300 Inertial Measurement Unit 
+%       Sensonor AS. Sensonor STIM300 Inertial Measurement Unit
 %       http://www.sensonor.com/gyro-products/inertial-measurement-units/stim300.aspx7.
 %
 %       Two hours of static measurements from STIM300 IMU were generously
-%       provided by Prof. Zhu, Dr. Yang, and Mr. Bo Sun, all from the Laboratory 
-%       of Precision Measuring Technology and Instruments, Tianjin University, 
+%       provided by Prof. Zhu, Dr. Yang, and Mr. Bo Sun, all from the Laboratory
+%       of Precision Measuring Technology and Instruments, Tianjin University,
 %       Tianjin, China.
 %
 % Version: 003
@@ -99,14 +99,14 @@ to = (ref.t(end) - ref.t(1));
 fprintf('NaveGo: dataset duration is %.2f hours or %.2f minutes or %.2f seconds. \n', (to/60/60), (to/60), to)
 
 ref.lat = zeros(N,1);
-ref.vel = zeros(M); 
+ref.vel = zeros(M);
 ref.h   = zeros(N,1);
 
 ref.fb = zeros(M);
 ref.wb = zeros(M);
 
-%     DCMnb: Nx9 Direct Cosine Matrix nav-to-body. Each row contains 
-%            the elements of one matrix ordered by columns as 
+%     DCMnb: Nx9 Direct Cosine Matrix nav-to-body. Each row contains
+%            the elements of one matrix ordered by columns as
 %            [a11 a21 a31 a12 a22 a32 a13 a23 a33].
 
 ref.DCMnb = zeros(N,9);
@@ -141,12 +141,12 @@ ustrain.gstd = [0.00272391738310747  0.00248849782611228  0.00272332577563485];
 
 ustrain.ab_fix = [1.73301445792617e-13 -7.93732502701179e-13 -1.84847751355576e-13];
 ustrain.gb_fix = [4.00424136983284e-14 4.98197419961447e-15 -6.5696457219509e-15];
-      
+
 ustrain.ab_corr = [40 20 1000];
 ustrain.gb_corr = [500 700 200];
-   
-ustrain.vrrw = [0.00031522133759985 0.000519606636158211 0.000396688807571295];      
-ustrain.arrw = [8.21484738626e-05 4.54275740041735e-05 0.000103299115514897]; 
+
+ustrain.vrrw = [0.00031522133759985 0.000519606636158211 0.000396688807571295];
+ustrain.arrw = [8.21484738626e-05 4.54275740041735e-05 0.000103299115514897];
 
 ustrain.ab_drift = [0.000252894096875598 0.000349683866037958 0.000323068534025731];
 ustrain.gb_drift = [7.6339404800228e-05 4.50248175403541e-05 8.75796277840371e-05];

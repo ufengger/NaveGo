@@ -111,7 +111,7 @@ fprintf(' Altitude,  %s = %.4e m, GPS = %.4e m \n', string, RMSE_h,   RMSE_h_g);
 
 %% Output data structure
 
-rmse_v = [  RMSE_roll;  RMSE_pitch; RMSE_yaw;    
+rmse_v = [  RMSE_roll;  RMSE_pitch; RMSE_yaw;
             RMSE_vn;    RMSE_ve;    RMSE_vd;
             RMSE_lat;   RMSE_lon;   RMSE_h;
             RMSE_vn_g;  RMSE_ve_g;  RMSE_vd_g;

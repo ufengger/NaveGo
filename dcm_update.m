@@ -40,7 +40,7 @@ S = skewm(euler);
 magn = norm(euler);
 
 if magn == 0,
-    
+
     A = eye(3);
 else
     % A(k), Eq. 11.10, p. 312.

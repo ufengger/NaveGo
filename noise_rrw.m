@@ -28,7 +28,7 @@ function [rrw_n] = noise_rrw (rrw, dt, M)
 %   <http://www.gnu.org/licenses/>.
 %
 % Reference:
-%          
+%
 %
 % Version: 001
 % Date:    2017/07/28
@@ -39,9 +39,9 @@ rrw_n = zeros(M);
 N = M(1);
 
 for i=1:3
-    
+
     b_noise = randn(N-1,1);
-    
+
     for j=2:N
         rrw_n (j, i) = rrw_n(j-1, i) + rrw(i) * dt .* b_noise(j-1);
     end

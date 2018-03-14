@@ -52,22 +52,22 @@ if nargin < 7, att_mode  = 'quaternion'; end
 wb_n = ( wb - DCMbn' * (omega_ie_N + omega_en_N));
 
 if strcmp(att_mode, 'quaternion')
-%% Quaternion update   
+%% Quaternion update
 
     qua_n   = qua_update(qua, wb_n, dt);    % Update quaternion
     qua_n   = qua_n / norm(qua_n);          % Brute-force normalization
     DCMbn_n = qua2dcm(qua_n);               % Update DCM
     euler   = qua2euler(qua_n);             % Update Euler angles
-    
+
 elseif strcmp(att_mode, 'dcm')
-%% DCM update    
-    
-    euler_i = wb_n * dt;                    % Incremental Euler angles 
+%% DCM update
+
+    euler_i = wb_n * dt;                    % Incremental Euler angles
     DCMbn_n = dcm_update(DCMbn, euler_i);   % Update DCM
     euler   = dcm2euler(DCMbn_n);           % Update Euler angles
     qua_n   = euler2qua(euler);             % Update quaternion
     qua_n   = qua_n / norm(qua_n);          % Brute-force normalization
-    
+
 else
     error('att_update: no attitude update mode defined.')
 end

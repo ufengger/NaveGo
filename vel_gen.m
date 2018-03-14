@@ -37,7 +37,7 @@ function vel_ned = vel_gen(lat, lon, h, t)
 % Author:  Rodrigo Gonzalez <rodralez@frm.utn.edu.ar>
 % URL:     https://github.com/rodralez/navego
 
-%% Down Velocity 
+%% Down Velocity
 
 idl = h < 0;
 
@@ -49,7 +49,7 @@ end
 
 vd = - diff_central(t, h);
 
-%% North Velocity 
+%% North Velocity
 
 if (isa(h,'single'))
     [RM,~] = radius(lat(2:end-1), 'single');
@@ -65,7 +65,7 @@ end
 vn_c = diff_central(t, lat);
 vn = vn_c .* (RM + h(2:end-1));
 
-%% East Velocity 
+%% East Velocity
 
 if (isa(h,'single'))
     [~, RN] = radius(lat(2:end-1), 'single');
@@ -80,7 +80,7 @@ ve_c = diff_central(t, lon);
 ve   = ve_c .* (RN + h(2:end-1)) .* cos (lat(2:end-1));
 
 %% NED Velocity
-  
+
 vel = [vn ve vd];
 
 vel_ned = sgolayfilt(vel, 5, 15);

@@ -49,9 +49,9 @@ M = [N, 3];
 
 % If true turn rates are provided...
 if (isfield(ref, 'wb'))
-    
+
     gyro_b = ref.wb;
-    
+
 % If not, obtain turn rates from DCM
 else
     gyro_raw = gyro_gen_delta(ref.DCMnb, diff(ref.t));
@@ -63,7 +63,7 @@ end
 
 g_err_b = zeros(M);
 for i = 1:N,
-    
+
     dcmnb = reshape(ref.DCMnb(i,:), 3, 3);
     omega_ie_n = earthrate(ref.lat(i));
     omega_en_n = transportrate(ref.lat(i), ref.vel(i,1), ref.vel(i,2), ref.h(i));
@@ -90,7 +90,7 @@ end
 % -------------------------------------------------------------------------
 % Simulate dynamic bias (bias instability) as a First-order Gauss-Markov model
 
-dt = 1/imu.freq; 
+dt = 1/imu.freq;
 [g_dbias] = noise_dbias (imu.gb_corr, imu.gb_drift, dt, M);
 
 % -------------------------------------------------------------------------

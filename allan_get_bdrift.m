@@ -4,7 +4,7 @@ function [b_drift, t_corr] = allan_get_bdrift (tau, allan)
 % INPUT
 % - tau, Nx1 Allan variance time vector in seconds.
 % - allan, Nx1 Allan variance vector.
-% 
+%
 % OUTPUT
 % - b_drift, bias instability values.
 % - t_corr, correlation time values.
@@ -36,8 +36,8 @@ function [b_drift, t_corr] = allan_get_bdrift (tau, allan)
 % Author:  Rodrigo Gonzalez <rodralez@frm.utn.edu.ar>
 % URL:     https://github.com/rodralez/navego
 
-idx = find (allan == min(allan));   % Index for minimun value of AV.   
+idx = find (allan == min(allan));   % Index for minimun value of AV.
 
 b_drift = allan(idx) ;              % BI. For gyro, rad-per-sec.
                                     % BI. For acc,  meters-per-sec^2.
-t_corr  = tau(idx)  ;               % BI, correlation time, in seconds.  
+t_corr  = tau(idx)  ;               % BI, correlation time, in seconds.

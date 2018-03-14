@@ -23,7 +23,7 @@ function [retval, s, errorb, tau] = allan_overlap(data,tau,name,verbose)
 %     grouped in fractional quantities!). Invalid values are ignored.
 % NAME is an optional label that is added to the plot titles.
 % VERBOSE sets the level of status messages:
-%     0 = silent & no data plots; 1 = status messages; 2 = all messages 
+%     0 = silent & no data plots; 1 = status messages; 2 = all messages
 %
 % Outputs:
 % RETVAL is the array of overlapping Allan deviation values at each TAU.
@@ -37,7 +37,7 @@ function [retval, s, errorb, tau] = allan_overlap(data,tau,name,verbose)
 %
 % To compute the overlapping Allan deviation for the data in the variable "lt":
 % >> lt
-% lt = 
+% lt =
 %     freq: [1x86400 double]
 %     rate: 0.5
 %
@@ -60,7 +60,7 @@ function [retval, s, errorb, tau] = allan_overlap(data,tau,name,verbose)
 %   However, the timestamp-based calculation is performed using frequency
 %   data. Phase data is differentiated to generate frequency data if necessary.
 %  No pre-processing of the data is performed, except to remove any
-%   initial offset in the time record. 
+%   initial offset in the time record.
 %  For rate-based data, ADEV is computed only for tau values greater than the
 %   minimum time between samples and less than the half the total time. For
 %   time-stamped data, only tau values greater than the maximum gap between
@@ -129,7 +129,7 @@ versionstr = 'allan_overlap v2.24';
 if nargin < 4, verbose = 2; end
 if nargin < 3, name=''; end
 if nargin < 2 || isempty(tau), tau=2.^(-10:10); end
-if isfield(data,'rate') && isempty(data.rate), data.rate=0; end % v2.1 
+if isfield(data,'rate') && isempty(data.rate), data.rate=0; end % v2.1
 
 % Formatting for plots
 FontName = 'Arial';
@@ -174,7 +174,7 @@ if ~isfield(data,'freq')
     if verbose >= 1, fprintf(1,'allan_overlap: Fractional frequency data generated from phase data (M=%g).\n',length(data.freq)); end
 end
 if size(data.freq,2) > size(data.freq,1), data.freq=data.freq'; end % ensure columns
-    
+
 s.numpoints=length(data.freq);
 s.max=max(data.freq);
 s.min=min(data.freq);
@@ -203,14 +203,14 @@ sm=[]; sme=[];
 % Screen for outliers using 5x Median Absolute Deviation (MAD) criteria
 MAD = median(abs(medianfreq)/0.6745);
 if verbose >= 1 && any(abs(medianfreq) > 5*MAD)
-    
+
     odl = (abs(medianfreq) > 5*MAD);
     outliers = data.freq(odl);
-    fprintf(1, 'allan_overlap: OUTLIERS: There appear to be %d outliers in the frequency data.\n', length(outliers));       
-  
+    fprintf(1, 'allan_overlap: OUTLIERS: There appear to be %d outliers in the frequency data.\n', length(outliers));
+
 %     idl = (abs(medianfreq) < 5*MAD);
 %     data.freq = data.freq(idl);
-    
+
 end
 
 
@@ -231,18 +231,18 @@ if isfield(data,'rate') && data.rate > 0 % if data rate was given
             error('\n phase or freq data missing [err10]');
         end
     end
-  
+
     % string for plot title
     name=[name ' (' num2str(data.rate) ' Hz)'];
 
     % what is the time interval between data points?
-    tmstep = 1/data.rate;      
-    
+    tmstep = 1/data.rate;
+
     % Is there time data? Just for curiosity/plotting, does not impact calculation
     if isfield(data,'time')
         % adjust time data to remove any starting gap; first time step
         %  should not be zero for comparison with freq data
-        dtime=data.time-data.time(1)+mean(diff(data.time)); 
+        dtime=data.time-data.time(1)+mean(diff(data.time));
         dtime=dtime(1:length(medianfreq)); % equalize the data vector lengths for plotting (v2.1)
         if verbose >= 2
             fprintf(1,'allan_overlap: End of timestamp data: %g sec.\n',dtime(end));
@@ -255,7 +255,7 @@ if isfield(data,'rate') && data.rate > 0 % if data rate was given
         dtime=(tmstep:tmstep:length(data.freq)*tmstep);
     end
 
-  
+
     % is phase data present? If not, generate it
     if ~isfield(data,'phase')
         nfreq=data.freq-s.mean;
@@ -267,14 +267,14 @@ if isfield(data,'rate') && data.rate > 0 % if data rate was given
     else
         dphase=data.phase;
     end
-    
+
     % check the range of tau values and truncate if necessary
     % find halfway point of time record
     halftime = round(tmstep*length(data.freq)/2);
     % truncate tau to appropriate values
     tau = tau(tau >= tmstep & tau <= halftime);
     if verbose >= 2, fprintf(1, 'allan_overlap: allowable tau range: %g to %g sec. (1/rate to total_time/2)\n',tmstep,halftime); end
-    
+
     % number of samples
     N=length(dphase);
     % number of samples per tau period
@@ -286,9 +286,9 @@ if isfield(data,'rate') && data.rate > 0 % if data rate was given
     m = m(m==round(m));
     %m=round(m);
     %fprintf(1,'m: %.50f\n',m)
-        
+
     if verbose >= 1, fprintf(1,'allan_overlap: calculating overlapping Allan deviation...\n       '); end
-    
+
     % calculate the Allan deviation for each value of tau
     k=0; tic;
     for i = tau
@@ -305,47 +305,47 @@ if isfield(data,'rate') && data.rate > 0 % if data rate was given
         md1=diff(mp,1,2);
         md2=diff(md1,1,2);
         md1=reshape(md2,1,[]);
-        
+
         % compute overlapping ADEV from phase values
         %  only the first N-2*m(k) samples are valid
         sm(k)=sqrt((1/(2*(N-2*m(k))*i^2))*sum(md1(1:N-2*m(k)).^2));
-        
+
         % estimate error bars
         sme(k)=sm(k)/sqrt(N-2*m(k));
-        
+
 
     end % repeat for each value of tau
-    
+
     if verbose >= 2, fprintf(1,'\n'); end
     calctime=toc; if verbose >= 2, fprintf(1,'allan_overlap: Elapsed time for calculation: %g seconds\n',calctime); end
 
-        
-    
-%% Irregular data, no fixed interval    
+
+
+%% Irregular data, no fixed interval
 elseif isfield(data,'time')
     % the interval between measurements is irregular
     %  so we must group the data by time
     if verbose >= 1, fprintf(1, 'allan_overlap: irregular rate data (no fixed sample rate)\n'); end
 
-    
+
     % string for plot title
     name=[name ' (timestamp)'];
-    
+
 
     % adjust time to remove any starting offset
     dtime=data.time-data.time(1)+mean(diff(data.time));
-    
+
     % save the freq data for the loop
     dfreq=data.freq;
     dtime=dtime(1:length(dfreq));
-    
+
     dfdtime=diff(dtime); % only need to do this once (v2.1)
     % where is the maximum gap in time record?
     gap_pos=find(dfdtime==max(dfdtime));
     % what is average data spacing?
     avg_gap = mean(dfdtime);
     s.avg_rate = 1/avg_gap; % save avg rate for user (v2.1)
-    
+
     if verbose >= 2
         fprintf(1, 'allan_overlap: WARNING: irregular timestamp data (no fixed sample rate).\n');
         fprintf(1, '       Calculation time may be long and the results subject to interpretation.\n');
@@ -353,7 +353,7 @@ elseif isfield(data,'time')
         fprintf(1, '       Continue at your own risk! (press any key to continue)\n');
         pause;
     end
-    
+
     if verbose >= 1
         fprintf(1, 'allan_overlap: End of timestamp data: %g sec\n',dtime(end));
     	fprintf(1, '       Average rate: %g Hz (%g sec/measurement)\n',1/avg_gap,avg_gap);
@@ -364,7 +364,7 @@ elseif isfield(data,'time')
             fprintf(1, '       WARNING: Max. gap in time record is suspiciously large (>5x the average interval).\n');
         end
     end
-    
+
 
     % find halfway point
     halftime = fix(dtime(end)/2);
@@ -373,7 +373,7 @@ elseif isfield(data,'time')
     if isempty(tau)
         error('allan_overlap: ERROR: no appropriate tau values (> %g s, < %g s)\n',max(dfdtime),halftime);
     end
-    
+
 
     % number of samples
     M=length(dfreq);
@@ -388,9 +388,9 @@ elseif isfield(data,'time')
         fa=[];
 
 %         if verbose >= 2, fprintf(1,'%d ',i); end
-        
+
         freq = dfreq; time = dtime;
-               
+
         % compute overlapping samples (y_k) for this tau
         %for j = 1:i
         for j = 1:m(k) % (v2.1)
@@ -401,7 +401,7 @@ elseif isfield(data,'time')
             % truncate data set to an even multiple of this tau value
             %freq = freq(time <= time(end)-rem(time(end),i));
             %time = time(time <= time(end)-rem(time(end),i));
-                        
+
             % break up the data into overlapping groups of tau length
             while i*km <= time(end)
                 km=km+1;
@@ -423,16 +423,16 @@ elseif isfield(data,'time')
 
             end
             %fa
-            
+
             % shift data vector by -1 and repeat
             freq=circshift(dfreq,(size(freq)>1)*-j);
             freq(end-j+1:end)=[];
             time=circshift(dtime,(size(time)>1)*-j);
             time(end-j+1:end)=[];
             time=time-time(1)+avg_gap; % remove time offset
-            
+
         end
-        
+
         % compute second differences of fractional frequency values (y_k+m - y_k)
         fd1=diff(fa,1,2);
         fd1=reshape(fd1,1,[]);
@@ -443,14 +443,14 @@ elseif isfield(data,'time')
 
             % estimate error bars
             sme(k)=sm(k)/sqrt(M+1);
-            
+
             if verbose >= 2, fprintf(1,'\n'); end
-            
+
         else
             if verbose >=2, fprintf(1,' tau=%g dropped due to timestamp irregularities\n',tau(k)); end
             sm(k)=0; sme(k)=0;
         end
-        
+
 
     end
 
@@ -473,7 +473,7 @@ end
 %% Plotting
 
 if verbose >= 2 % show all data
-    
+
     % plot the frequency data, centered on median
     if size(dtime,2) > size(dtime,1), dtime=dtime'; end % this should not be necessary, but dsplot 1.1 is a little bit brittle
     try
@@ -495,7 +495,7 @@ if verbose >= 2 % show all data
     hm=plot([fx(1) fx(2)],[5*MAD 5*MAD],'-r');
     plot([fx(1) fx(2)],[-5*MAD -5*MAD],'-r');
     % show linear fit line
-    hf=plot(xlim,polyval(s.linear,xlim)-s.median,'-g');    
+    hf=plot(xlim,polyval(s.linear,xlim)-s.median,'-g');
     title(['Data: ' name],'FontSize',FontSize+2,'FontName','Arial');
     %set(get(gca,'Title'),'Interpreter','none');
     xlabel('Time [sec]','FontSize',FontSize,'FontName',FontName);
@@ -509,7 +509,7 @@ if verbose >= 2 % show all data
     % tighten up
     xlim([dtime(1) dtime(end)]);
 
-    
+
 end % end plot raw data
 
 
@@ -538,18 +538,18 @@ if verbose >= 2 % show analysis results
         % expand the x axis a little bit so that the errors bars look nice
         adax = axis;
         axis([adax(1)*0.9 adax(2)*1.1 adax(3) adax(4)]);
-        
+
         % display the minimum value
-        fprintf(1,'allan: Minimum overlapping ADEV value: %g at tau = %g seconds\n',min(sm),tau(sm==min(sm)));        
-        
+        fprintf(1,'allan: Minimum overlapping ADEV value: %g at tau = %g seconds\n',min(sm),tau(sm==min(sm)));
+
     elseif verbose >= 1
         fprintf(1,'allan_overlap: WARNING: no values calculated.\n');
         fprintf(1,'       Check that TAU > 1/DATA.rate and TAU values are divisible by 1/DATA.rate\n');
         fprintf(1,'Type "help allan_overlap" for more information.\n\n');
     end
-    
+
 end % end plot analysis
-        
+
 retval = sm;
 errorb = sme;
 

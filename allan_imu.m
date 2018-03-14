@@ -16,19 +16,19 @@ function [imu] = allan_imu (imu, verbose)
 % OUTPUT
 % - imu. Input data structure is added with the following new fields:
 %
-%     arw, 1x3 vector, angle random walk (rad/root-s). Value is taken 
+%     arw, 1x3 vector, angle random walk (rad/root-s). Value is taken
 %       straightfoward from the plot at t = 1 s.
-%       Note: units of rad/s from the plot have to be transformed to 
-%       rad/root-s. This is done by multiplying (rad/s * root-s/root-s) = 
-%       (rad/s * root-s/1) = rad/root-s, since root-s = 1 for tau = 1, time 
+%       Note: units of rad/s from the plot have to be transformed to
+%       rad/root-s. This is done by multiplying (rad/s * root-s/root-s) =
+%       (rad/s * root-s/1) = rad/root-s, since root-s = 1 for tau = 1, time
 %       at which random walk is evaluated.
-%     
 %
-%     vrw, 1x3 vector, velocity random walk (m/s/root-s). Value is taken 
+%
+%     vrw, 1x3 vector, velocity random walk (m/s/root-s). Value is taken
 %       straightfoward from the plot at t = 1 s.
-%       Note: units of m/s^2 from the plot have to be transformed to 
-%       m/s/root-s. This is done by multiplying (m/s^2 * root-s/root-s) = 
-%       (m/s^2 * root-s/1) = m/s/root-s, since root-s = 1 for tau = 1, time 
+%       Note: units of m/s^2 from the plot have to be transformed to
+%       m/s/root-s. This is done by multiplying (m/s^2 * root-s/root-s) =
+%       (m/s^2 * root-s/1) = m/s/root-s, since root-s = 1 for tau = 1, time
 %       at which random walk is evaluated.
 %
 %     gb_drift, 1x3 vector, gyros bias instability in rad/s. Value is taken
@@ -131,9 +131,9 @@ function [imu] = allan_imu (imu, verbose)
 if (nargin < 2), verbose = 2; end
 
 if (isfield(imu, 'fb_tau') )
-   
-fields = {'fb_tau','fb_allan','fb_error','wb_tau','wb_allan','wb_error'};  
-            
+
+fields = {'fb_tau','fb_allan','fb_error','wb_tau','wb_allan','wb_error'};
+
     imu = rmfield(imu, fields);
 end
 
@@ -153,7 +153,7 @@ imu.gb_corr = zeros(1,3);
 
 % Standard deviation
 
-% Static bias 
+% Static bias
 imu.ab_fix = zeros(1,3);
 imu.gb_fix = zeros(1,3);
 
@@ -162,13 +162,13 @@ imu.ab_std    = zeros(1,3);
 imu.ab_max    = zeros(1,3);
 imu.ab_min    = zeros(1,3);
 imu.ab_mean   = zeros(1,3);
-imu.ab_median = zeros(1,3);    
+imu.ab_median = zeros(1,3);
 
 imu.gb_std    = zeros(1,3);
 imu.gb_max    = zeros(1,3);
 imu.gb_min    = zeros(1,3);
 imu.gb_mean   = zeros(1,3);
-imu.gb_median = zeros(1,3);   
+imu.gb_median = zeros(1,3);
 
 %% TIME VECTOR FOR ALLAN VARIANCE
 
@@ -187,7 +187,7 @@ TAU = 10.^(exp_min:exp_max);
 
 tau_v = [];
 for i = 1:length(TAU)-1
-    
+
     tau_v = [tau_v TAU(i):TAU(i):TAU(i+1) ];
 end
 
@@ -204,27 +204,27 @@ fprintf('allan_imu: length of time is %02.3d hours or %.2f minutes or %.2f secon
 %% ACCELEROMETERS
 
 for i=1:3
-    
-    fprintf('\nallan_imu: Allan variance for FB %d \n', i)   
-    
+
+    fprintf('\nallan_imu: Allan variance for FB %d \n', i)
+
     data.freq = imu.fb(:,i);
-    
+
     [allan_o, s, error, tau] = allan_overlap(data, tau_v ,'allan_overlap', verbose);
-    
+
     imu.fb_tau  (:,i) = tau';
     imu.fb_allan(:,i) = allan_o';
     imu.fb_error(:,i) = error';
-    
+
     vrw = allan_get_rw (tau, allan_o, dt);
     imu.vrw(i) = vrw;
-    
+
     [b_drift, t_corr] = allan_get_bdrift (tau, allan_o);
     imu.ab_drift(i) = b_drift;
     imu.ab_corr(i)  = t_corr;
-    
+
     imu.ab_std(i)    = s.std;
-    imu.ab_fix(i)    = s.mean; 
-    imu.ab_mean(i)   = s.mean;    
+    imu.ab_fix(i)    = s.mean;
+    imu.ab_mean(i)   = s.mean;
     imu.ab_max(i)    = s.max;
     imu.ab_min(i)    = s.min;
     imu.ab_median(i) = s.median;
@@ -234,8 +234,8 @@ end
 figure;
 
 for i=1:3
-    
-    loglog(imu.fb_tau(:,i), imu.fb_allan(:,i), plot_line(i,:));    
+
+    loglog(imu.fb_tau(:,i), imu.fb_allan(:,i), plot_line(i,:));
     hold on
 end
 
@@ -247,40 +247,40 @@ legend('ACC X','ACC Y', 'ACC Z' )
 %% GYROSCOPES
 
 for i=1:3
-    
+
     fprintf('\nallan_imu: Allan variance for WB %d \n', i)
-    
+
     data.freq = imu.wb(:,i);
-    
+
     [allan_o, s, error, tau] = allan_overlap(data, tau_v ,'allan_overlap', verbose);
-    
+
     imu.wb_tau  (:,i) = tau;
     imu.wb_allan(:,i) = allan_o;
     imu.wb_error(:,i) = error;
-    
+
     arw = allan_get_rw (tau, allan_o, dt);
     imu.arw(i) = arw;
-    
+
     [b_drift, t_corr] = allan_get_bdrift (tau, allan_o);
     imu.gb_drift(i) = b_drift;
     imu.gb_corr(i) = t_corr;
-    
-    imu.gb_fix(i) = mean(data.freq); 
-    
+
+    imu.gb_fix(i) = mean(data.freq);
+
     imu.gb_std(i)    = s.std;
-    imu.gb_fix(i)    = s.mean; 
-    imu.gb_mean(i)   = s.mean;     
+    imu.gb_fix(i)    = s.mean;
+    imu.gb_mean(i)   = s.mean;
     imu.gb_max(i)    = s.max;
     imu.gb_min(i)    = s.min;
     imu.gb_fix(i)    = s.mean;
-    imu.gb_median(i) = s.median;    
+    imu.gb_median(i) = s.median;
 end
 
 % Plot
 figure;
 
 for i=1:3
-    
+
     loglog(imu.wb_tau(:,i), imu.wb_allan(:,i), plot_line(i,:));
     hold on
 end

@@ -1,6 +1,6 @@
 function qua = euler2qua(euler)
 % euler2qua: converts from Euler angles to quaternion.
-% 
+%
 % INPUT:
 %   euler,	3x1 Euler angles (rad).
 %

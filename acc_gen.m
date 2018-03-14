@@ -48,21 +48,21 @@ M = [N, 3];
 
 % If true accelerations are provided...
 if (isfield(ref, 'fb'))
-    
+
     acc_b = ref.fb;
-    
+
 % If not, obtain acceleration from velocity
 elseif (isfield(ref, 'vel'))
-    
+
     acc_raw = (diff(ref.vel)) ./ [diff(ref.t) diff(ref.t) diff(ref.t)];
     acc_raw = [ 0 0 0; acc_raw; ];
     % Noise introduced by differentation should be smoothed.
-    acc_ned = sgolayfilt(acc_raw, 10, 45);  
+    acc_ned = sgolayfilt(acc_raw, 10, 45);
     acc_b = acc_nav2body(acc_ned, ref.DCMnb);
-    
+
 % If not, obtain acceleration from position
 else
-    
+
     % Method: LLH > ECEF > NED
     [~, acc_ned] = pllh2vned (ref);
     acc_b = acc_nav2body(acc_ned, ref.DCMnb);
@@ -104,7 +104,7 @@ end
 % -------------------------------------------------------------------------
 % Simulate dynamic bias (bias instability) as a First-order Gauss-Markov model
 
-dt = 1/imu.freq; 
+dt = 1/imu.freq;
 [a_dbias] = noise_dbias (imu.ab_corr, imu.ab_drift, dt, M);
 
 % -------------------------------------------------------------------------
@@ -115,9 +115,9 @@ dt = 1/imu.freq;
 % sigma_aK = ustrain.fb_allan(idx) ; %.* sqrt(3/TAU)
 
 % for i=1:3
-%     
+%
 %     b_noise = randn(N-1,1);
-%     
+%
 %     for j=2:N
 %         arrw (j, i) = arrw(j-1, i) + imu.arrw(i) * dt .* b_noise(j-1);
 %     end
