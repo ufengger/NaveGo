@@ -96,6 +96,7 @@ if nargin < 3, att_mode  = 'quaternion'; end
 if nargin < 4, precision = 'double'; end
 
 %% ZUPT detection algorithm
+
 ZUPT_THRELHOLD = 0.5;   % m/s
 ZUPT_WINDOW = 4;        % seconds
 zupt = false;
@@ -242,23 +243,20 @@ for j = 2:Mg                            % 5 Hz
         omega_en_n = transportrate(lat_e(i-1), vel_e(i-1,1), vel_e(i-1,2), h_e(i-1));
 
         % Attitude update
-        [qua_n, DCMbn_n, euler] = att_update(wb_corrected, DCMbn, qua, ...
+        [qua_n, DCMbn, euler] = att_update(wb_corrected, DCMbn, qua, ...
             omega_ie_n, omega_en_n, dti, att_mode);
         roll_e(i) = euler(1);
         pitch_e(i)= euler(2);
         yaw_e(i)  = euler(3);
-        DCMbn = DCMbn_n;
         qua = qua_n;
 
         % Gravity update
         gn = gravity(lat_e(i-1), h_e(i-1));
 
         % Velocity update
-        fn = (DCMbn_n * fb_corrected);
+        fn = (DCMbn * fb_corrected);
         vel_n = vel_update(fn, vel_e(i-1,:), omega_ie_n, omega_en_n, gn', dti);
         vel_e (i,:) = vel_n;
-%         virtual_vel = DCMbn_n * [1 0.1 0.1]'.* (fb_corrected - DCMbn_n' * gn') * dti; %
-%         vel_e (i,:) = vel_e (i-1,:) + virtual_vel';
 
         % Position update
         pos = pos_update([lat_e(i-1) lon_e(i-1) double(h_e(i-1))], double(vel_e(i,:)), double(dti) );
@@ -311,10 +309,9 @@ for j = 2:Mg                            % 5 Hz
 
     % Innovations
     zp = Tpr * ([lat_e(i); lon_e(i); h_e(i);] - [gps.lat(j); gps.lon(j); gps.h(j);]) ...
-        + (DCMbn_n * gps.larm);         % cf. eq. (21e);
+        + (DCMbn * gps.larm);           % cf. eq. (21e);
 
     zv = (vel_e(i,:) - gps.vel(j,:))';  % cf. eq. (21d);
-
 
     %% KALMAN FILTER
 
@@ -325,7 +322,7 @@ for j = 2:Mg                            % 5 Hz
     upd = [vel_e(i,:) lat_e(i) h_e(i) fn'];
 
     % Update matrices F and G
-    [S.F, S.G] = F_update(upd, DCMbn_n, imu, dtg);
+    [S.F, S.G] = F_update(upd, DCMbn, imu, dtg);
 
     % Update matrix H
     if(zupt == false)
