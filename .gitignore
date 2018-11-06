@@ -5,3 +5,8 @@ imu1_e.mat
 imu2_e.mat
 /.svn/
 *.kml
+/examples/real-data/ekinox.csv
+/examples/real-data/nav_e.mat
+/examples/synthetic-data/gnss.mat
+/examples/synthetic-data/nav1_e.mat
+/examples/synthetic-data/nav2_e.mat
