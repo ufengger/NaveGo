@@ -1,5 +1,11 @@
 function [ref_i, ref] = navego_interpolation (data, ref)
-% navego_interpolation: interpolates data using reference time vector.
+% navego_interpolation: interpolates navigation data using reference time vector.
+%
+% INPUT:
+%   data, navigation data to be interpolated
+%   ref, reference dataset.
+%
+% OUTPUT
 %
 %   Copyright (C) 2014, Rodrigo Gonzalez, all rights reserved.
 %
@@ -19,8 +25,8 @@ function [ref_i, ref] = navego_interpolation (data, ref)
 %   License along with this program. If not, see
 %   <http://www.gnu.org/licenses/>.
 %
-% Version: 003
-% Date:    2017/05/18
+% Version: 004
+% Date:    2018/10/10
 % Author:  Rodrigo Gonzalez <rodralez@frm.utn.edu.ar>
 % URL:     https://github.com/rodralez/navego
 
@@ -32,7 +38,7 @@ if (D > R)
     method = 'nearest';
 else
 
-    method = 'linear';
+    method = 'spline';
 end
 
 %% Adjust reference data structure before interpolating
@@ -88,11 +94,11 @@ if (ref.t(end) > data.t(end))
     end
 end
 
-%% Interpolate
+%% Interpolation
 
-if (isfield(data, 'roll') & isfield(ref, 'roll'))  % If data is from INS/GPS solution...
+if (isfield(data, 'roll') & isfield(ref, 'roll'))  % If data is from INS/GNSS solution...
 
-    fprintf('navego_interpolation: %s method to interpolate INS/GPS solution\n', method)
+    fprintf('navego_interpolation: %s method to interpolate INS/GNSS solution\n', method)
 
     ref_i.t     = ref.t;
     ref_i.roll  = interp1(data.t, data.roll,  ref.t, method);
@@ -107,7 +113,7 @@ if (isfield(data, 'roll') & isfield(ref, 'roll'))  % If data is from INS/GPS sol
         ref_i.vel = interp1(data.t, data.vel,   ref.t, method);
         flag_vel  = any(isnan(ref_i.vel));
     else
-        flag_vel = logical(zeros(1,3));
+        flag_vel = false(1,3);
     end
 
     flag = any(isnan(ref_i.t)) | any(isnan(ref_i.roll)) | any(isnan(ref_i.pitch)) | any(isnan(ref_i.yaw)) |  ...
@@ -116,12 +122,12 @@ if (isfield(data, 'roll') & isfield(ref, 'roll'))  % If data is from INS/GPS sol
     % Test interpolated dataset
     if(flag)
 
-        error('navego_interpolation: NaN value in INS/GPS interpolated solution')
+        error('navego_interpolation: NaN value in INS/GNSS interpolated solution')
     end
 
-else  % If dataset is from GPS-only solution...
+else  % If dataset is from GNSS-only solution...
 
-    fprintf('navego_interpolation: %s method to interpolate GPS-only solution\n', method)
+    fprintf('navego_interpolation: %s method to interpolate GNSS-only solution\n', method)
 
     ref_i.t   = ref.t;
     ref_i.lat = interp1(data.t, data.lat, ref.t, method);
@@ -133,7 +139,7 @@ else  % If dataset is from GPS-only solution...
         ref_i.vel = interp1(data.t, data.vel,   ref.t, method);
         flag_vel = any(isnan(ref_i.vel));
     else
-        flag_vel = logical(zeros(1,3));
+        flag_vel = false(1,3);
     end
 
     flag = any(isnan(ref_i.t)) | any(isnan(ref_i.lat)) | any(isnan(ref_i.lon)) | ...
@@ -142,7 +148,7 @@ else  % If dataset is from GPS-only solution...
     % Test interpolated dataset
     if(flag)
 
-        error('navego_interpolation: NaN value in GPS-only interpolated solution')
+        error('navego_interpolation: NaN value in GNSS-only interpolated solution')
     end
 end
 

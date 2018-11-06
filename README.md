@@ -4,11 +4,11 @@ This is a fork of NaveGo.
 
 # NaveGo
 
-[![Releases](https://img.shields.io/badge/release-v1.0-green.svg?style=plastic)](https://github.com/rodralez/NaveGo/releases) [![DOI](https://zenodo.org/badge/12745155.svg)](https://zenodo.org/badge/latestdoi/12745155)
+[![Releases](https://img.shields.io/badge/release-v1.1-green.svg?style=plastic)](https://github.com/rodralez/NaveGo/releases) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1464202.svg)](https://doi.org/10.5281/zenodo.1464202)
 
 NaveGo: an open-source MATLAB/GNU-Octave toolbox for processing integrated navigation systems and performing inertial sensors profiling analysis.
 
-NaveGo is an open-source MATLAB/GNU Octave toolbox for processing integrated navigation systems, simulating inertial sensors and GPS receptor, and performing inertial sensors analysis that is freely available online. It is developed under MATLAB/GNU-Octave due to this programming language has become a *de facto* standard for simulation and mathematical computing. NaveGo has been verified by processing real-world data from a real trajectory and contrasting results with a commercial, closed-source software package. Difference between both solutions have shown to be negligible. For more information read (Gonzalez et al., 2017).
+NaveGo is an open-source MATLAB/GNU Octave toolbox for processing integrated navigation systems and simulating inertial sensors and a GNSS receiver. It also performs inertial sensors analysis using the Allan variance. It is freely available online. It is developed under MATLAB/GNU-Octave due to this programming language has become a *de facto* standard for simulation and mathematical computing. NaveGo has been verified by processing real-world data from a real trajectory and contrasting results with a commercial, closed-source software package. Difference between both solutions have shown to be negligible. For more information read (Gonzalez et al., 2017).
 
 NaveGo is supported at the moment by three academic research groups: GridTics at the National University of Technology (Argentina), Engineering School at the National University of Cuyo (Argentina), and DIATI at the Politecnico di Torino (Italy). 
 
@@ -18,17 +18,17 @@ Main features of NaveGo are:
 
 * Processing of an inertial navigation system (INS).
 
-* Processing of a loosely-coupled integrated navigation system (INS/GPS).
+* Processing of a loosely-coupled integrated navigation system (INS/GNSS).
 
-* Simulation of inertial sensors and GPS.
+* Simulation of inertial sensors and GNSS.
 
 * Zero Velocity Update (ZUPT) detection algorithm.
 
-* Implementation of the Allan variance procedure to characterize inertial sensors' typical errors.
+* Allan variance technique to characterize inertial sensors' typical errors.
 
-## How to cite this work
+## Please, cite our work
 
-We gently ask everyone using NaveGo in his/her research to add the following two cites to his/her papers:
+If you are using NaveGo in your research, we gently ask you to add the following two cites to your future papers:
 
 * (Gonzalez et al., 2017) R. Gonzalez, C.A. Catania, P. Dabove, J.C. Taffernaberry, and M. Piras. Model validation of an open-source framework for post-processing INS/GNSS systems. III International Conference on Geographical Information Systems Theory, Applications and Management (GISTAM 2017). Porto, Portugal. April 2017. [Download](http://www.scitepress.org/Papers/2017/63139/index.html).
 
@@ -36,11 +36,11 @@ We gently ask everyone using NaveGo in his/her research to add the following two
 
 An URL to NaveGo should be provided as the following cite:
 
-Rodrigo Gonzalez, Carlos Catania, and Paolo Dabove (2017). NaveGo: an open-source MATLAB/GNU-Octave toolbox for processing integrated navigation systems and performing inertial sensors profiling analysis. DOI: 10.5281/zenodo.841872. URL: https://github.com/rodralez/NaveGo/.
+Gonzalez, Rodrigo. NaveGo Release v1.1 (Version 1.1). Zenodo. http://doi.org/10.5281/zenodo.1464202. 2018, October 16.
 
 ## Contributions
 
-We are looking for contributors for NaveGo! Since integrated navigation is a topic used in several fields as Geomatics, Geology, Mobile Mapping, Autonomous Driving, even Veterinary (yes, Veterinary!), we hope other communities than the navigation community compromise and contribute with this open-source project.
+We are looking for contributors for NaveGo! Since integrated navigation is a topic used in several fields as Geomatics, Geology, Mobile Mapping, Autonomous Driving, even Veterinary (yes, Veterinary!), we hope other communities other than the navigation community compromise and contribute with this open-source project.
 
 You can contribute in many ways: 
 
@@ -70,32 +70,41 @@ Other publications related to the development of NaveGo:
 
 Future features of NaveGo will be:
 
+* Tightly-coupled INS/GNSS. 
+
 * RTS smoother.
 
-* Tightly-coupled INS/GPS. 
+* Adaptive Kalman filter.
 
 
 ## Acknowledgments
 
 We would like to thank to many people that have contribute to make NaveGo a better tool:
 
-* Dr. Juan Ignacio Giribet (Universidad Nacional de Buenos Aires, Argentina) for this continuous support on theory aspects of INS/GPS systems.
+* Dr. Juan Ignacio Giribet (Universidad Nacional de Buenos Aires, Argentina) for this continuous support on theory aspects of INS/GNSS systems.
 
-* Dr. Charles K. Toth (The Ohio State University, USA), Dr. Allison Kealy, and M.Sc. Azmir Hasnur-Rabiain (both from The University of Melbourne, Australia) for generously sharing IMU and GPS datasets, and in particular, for Azmir's unselfish help.
+* Dr. Charles K. Toth (The Ohio State University, USA), Dr. Allison Kealy, and M.Sc. Azmir Hasnur-Rabiain (both from The University of Melbourne, Australia) for generously sharing IMU and GNSS datasets, and in particular, for Azmir's unselfish help.
 
 * Prof. Zhu, Dr. Yang, and Mr. Bo Sun, all from the Laboratory of Precision Measuring Technology and Instruments, Tianjin University, Tianjin, China, for contributing with IMU static measurements to test Allan variance routines.
 
 * Dr. Paolo Dabove and Dr. Marco Piras (both from DIATI, Politecnico di Torino, Italy) for helping to debug NaveGo and suggesting new features.
 
+
 # Examples
+
+The `example` folder contains several types of examples.
 
 ## Allan variance example
 
-Just execute the file `navego_allan_example.m`. It process 2-hours of static measurements from an Sensonor STIM300 IMU.
+Just execute the file `navego_allan_example.m`. Firstly, it process 2-hours of static measurements from an Sensonor STIM300 IMU. Then, it process about 5 hours of synthetic inertial data.
 
-## INS/GPS example
+## INS/GNSS integration example using real data
 
-The file `navego_example.m` tries to demonstrate how NaveGo works. It compares the performances of two simulated IMUs, ADIS16405 IMU and ADIS16488 IMU, both integrated with a simulated GPS.
+An example of how to use NaveGo to post-process real data is provided by `navego_example_real.m`. This script integrates measurements coming from an Ekinox-D IMU and Ekinox-D GNSS. This dataset was generated by driving a vehicle through the streets of Turin city (Italy).
+
+## INS/GNSS integration example using synthetic (simulated) data
+
+The file `navego_example.m` tries to demonstrate how NaveGo works. It compares the performances of two simulated IMUs, ADIS16405 IMU and ADIS16488 IMU, both integrated with a simulated GNSS.
 
 Next, a description of this file.
 
@@ -108,6 +117,13 @@ close all
 clear
 matlabrc
 
+addpath ../../
+addpath ../../simulation/
+addpath ../../conversions/
+
+versionstr = 'NaveGo, release v1.0';
+
+fprintf('\n%s.\n', versionstr)
 fprintf('\nNaveGo: starting simulation ... \n')
 
 ```
@@ -117,23 +133,23 @@ fprintf('\nNaveGo: starting simulation ... \n')
 
 % Comment any of the following parameters in order to NOT execute a particular portion of code
 
-GPS_DATA  = 'ON';   % Simulate GPS data
-IMU1_DATA = 'ON';   % Simulate ADIS16405 IMU data
-IMU2_DATA = 'ON';   % Simulate ADIS16488 IMU data
+GNSS_DATA = 'ON';   % Generate synthetic GNSS data
+IMU1_DATA = 'ON';   % Generate synthetic ADIS16405 IMU data
+IMU2_DATA = 'ON';   % Generate synthetic ADIS16488 IMU data
 
-IMU1_INS  = 'ON';   % Execute INS/GPS integration for ADIS16405 IMU
-IMU2_INS  = 'ON';   % Execute INS/GPS integration for ADIS16488 IMU
+IMU1_INS  = 'ON';   % Execute INS/GNSS integration for ADIS16405 IMU
+IMU2_INS  = 'ON';   % Execute INS/GNSS integration for ADIS16488 IMU
 
 PLOT      = 'ON';   % Plot results.
 
 % If a particular parameter is commented above, it is set by default to 'OFF'.
 
-if (~exist('GPS_DATA','var')),  GPS_DATA  = 'OFF'; end
+if (~exist('GNSS_DATA','var')),  GNSS_DATA  = 'OFF'; end
 if (~exist('IMU1_DATA','var')), IMU1_DATA = 'OFF'; end
 if (~exist('IMU2_DATA','var')), IMU2_DATA = 'OFF'; end
-if (~exist('IMU1_INS','var')),  IMU1_INS = 'OFF'; end
-if (~exist('IMU2_INS','var')),  IMU2_INS = 'OFF'; end
-if (~exist('PLOT','var')),      PLOT     = 'OFF'; end
+if (~exist('IMU1_INS','var')),  IMU1_INS  = 'OFF'; end
+if (~exist('IMU2_INS','var')),  IMU2_INS  = 'OFF'; end
+if (~exist('PLOT','var')),      PLOT      = 'OFF'; end
 
 ```
 
@@ -141,7 +157,7 @@ if (~exist('PLOT','var')),      PLOT     = 'OFF'; end
 
 ```matlab
 
-G = 9.81;           % Gravity constant, m/s^2
+G =  9.80665;       % Gravity constant, m/s^2
 G2MSS = G;          % g to m/s^2
 MSS2G = (1/G);      % m/s^2 to g
 
@@ -162,7 +178,7 @@ fprintf('NaveGo: loading reference dataset from a trajectory generator... \n')
 load ref.mat
 
 % ref.mat contains the reference data structure from which inertial 
-% sensors and GPS wil be simulated. It must contain the following fields:
+% sensors and GNSS wil be simulated. It must contain the following fields:
 
 %         t: Nx1 time vector (seconds).
 %       lat: Nx1 latitude (radians).
@@ -172,9 +188,8 @@ load ref.mat
 %      roll: Nx1 roll angles (radians).
 %     pitch: Nx1 pitch angles (radians).
 %       yaw: Nx1 yaw angle vector (radians).
-%        kn: 1x1 number of elements of time vector.
 %     DCMnb: Nx9 Direct Cosine Matrix nav-to-body. Each row contains 
-%            the elements of one matrix ordered by columns as 
+%            the elements of one DCM matrix ordered by columns as 
 %            [a11 a21 a31 a12 a22 a32 a13 a23 a33].
 %      freq: sampling frequency (Hz).
 
@@ -193,19 +208,19 @@ load ref.mat
 %      arrw: 1x3 angle rate random walks (rad/s^2/root-Hz).
 %       vrw: 1x3 velocity random walks (m/s^2/root-Hz).
 %      vrrw: 1x3 velocity rate random walks (m/s^3/root-Hz).
-%      gstd: 1x3 gyros standard deviations (radians/s).
-%      astd: 1x3 accrs standard deviations (m/s^2).
+%    g_std: 1x3 gyros standard deviations (radians/s).
+%    a_std: 1x3 accrs standard deviations (m/s^2).
 %    gb_fix: 1x3 gyros static biases or turn-on biases (radians/s).
 %    ab_fix: 1x3 accrs static biases or turn-on biases (m/s^2).
 %  gb_drift: 1x3 gyros dynamic biases or bias instabilities (radians/s).
 %  ab_drift: 1x3 accrs dynamic biases or bias instabilities (m/s^2).
 %   gb_corr: 1x3 gyros correlation times (seconds).
 %   ab_corr: 1x3 accrs correlation times (seconds).
-%     gpsd : 1x3 gyros dynamic biases PSD (rad/s/root-Hz).
-%     apsd : 1x3 accrs dynamic biases PSD (m/s^2/root-Hz);
+%    gb_psd: 1x3 gyros dynamic biases PSD (rad/s/root-Hz).
+%    ab_psd: 1x3 accrs dynamic biases PSD (m/s^2/root-Hz);
 %      freq: 1x1 sampling frequency (Hz).
-% ini_align: 1x3 initial attitude at t(1).
-% ini_align_err: 1x3 initial attitude errors at t(1).
+% ini_align: 1x3 initial attitude at t(1), [roll pitch yaw] (rad).
+% ini_align_err: 1x3 initial attitude errors at t(1), [roll pitch yaw] (rad).
 
 ADIS16405.arw      = 2   .* ones(1,3);     % Angle random walks [X Y Z] (deg/root-hour)
 ADIS16405.arrw     = zeros(1,3);           % Angle rate random walks [X Y Z] (deg/root-hour/s)
@@ -256,57 +271,67 @@ imu2 = imu_si_errors(ADIS16488, dt);        % Transform IMU manufacturer error u
 
 imu2.ini_align_err = [1 1 5] .* D2R;                     % Initial attitude align errors for matrix P in Kalman filter, [roll pitch yaw] (radians)  
 imu2.ini_align = [ref.roll(1) ref.pitch(1) ref.yaw(1)];  % Initial attitude align at t(1) (radians).
+
 ```
 
 ### Garmin 5-18 Hz GPS error profile
 
 ```matlab
 
-% GPS data structure:
+% GNSS data structure:
 %         t: Mx1 time vector (seconds).
 %       lat: Mx1 latitude (radians).
 %       lon: Mx1 longitude (radians).
 %         h: Mx1 altitude (m).
 %       vel: Mx3 NED velocities (m/s).
-%       std: 1x3 position standard deviations (rad, rad, m).
-%      stdm: 1x3 position standard deviations (m, m, m).
-%      stdv: 1x3 velocity standard deviations (m/s).
-%      larm: 3x1 lever arm (x-right, y-fwd, z-down) (m).
+%       std: 1x3 position standard deviations, [lat lon h] (rad, rad, m).
+%      stdm: 1x3 position standard deviations, [lat lon h] (m, m, m).
+%      stdv: 1x3 velocity standard deviations, [Vn Ve Vd] (m/s).
+%      larm: 3x1 lever arm from IMU to GNSS antenna (x-fwd, y-right, z-down) (m).
 %      freq: 1x1 sampling frequency (Hz).
+%   zupt_th: 1x1 ZUPT threshold (m/s).
+%  zupt_win: 1x1 ZUPT time window (seconds).
+%       eps: 1x1 time interval to compare IMU time vector to GNSS time vector (seconds).
 
-gps.stdm = [5, 5, 10];                 % GPS positions standard deviations [lat lon h] (meters)
-gps.stdv = 0.1 * KT2MS .* ones(1,3);   % GPS velocities standard deviations [Vn Ve Vd] (meters/s)
-gps.larm = zeros(3,1);                 % GPS lever arm [X Y Z] (meters)
-gps.freq = 5;                          % GPS operation frequency (Hz)
+gnss.stdm = [5 5 10];                   % GNSS positions standard deviations [lat lon h] (meters)
+gnss.stdv = 0.1 * KT2MS .* ones(1,3);   % GNSS velocities standard deviations [Vn Ve Vd] (meters/s)
+gnss.larm = zeros(3,1);                 % GNSS lever arm from IMU to GNSS antenna (x-fwd, y-right, z-down) (m).
+gnss.freq = 5;                          % GNSS operation frequency (Hz)
+
+% Parameters for ZUPT detection algorithm
+gnss.zupt_th = 0.5;   % ZUPT threshold (m/s).
+gnss.zupt_win = 4;    % ZUPT time window (seconds).
+
+gnss.eps = 1E-3;
 
 ```
 
-### Simulate GPS
+### Generate GNSS synthetic data
 
 ```matlab
 
 rng('shuffle')                  % Reset pseudo-random seed
 
-if strcmp(GPS_DATA, 'ON')       % If simulation of GPS data is required ...
+if strcmp(GNSS_DATA, 'ON')       % If simulation of GNSS data is required ...
     
-    fprintf('NaveGo: simulating GPS data... \n')
+    fprintf('NaveGo: generating GNSS synthetic data... \n')
     
-    gps = gps_err_profile(ref.lat(1), ref.h(1), gps); % Transform GPS manufacturer error units to SI units.
+    gnss = gnss_err_profile(ref.lat(1), ref.h(1), gnss); % Transform GNSS manufacturer error units to SI units.
     
-    [gps] = gps_gen(ref, gps);  % Generate GPS dataset from reference dataset.
+    gnss = gnss_gen(ref, gnss);  % Generate GNSS dataset from reference dataset.
 
-    save gps.mat gps
+    save gnss.mat gnss
     
 else
     
-    fprintf('NaveGo: loading GPS data... \n') 
+    fprintf('NaveGo: loading GNSS data... \n') 
     
-    load gps.mat
+    load gnss.mat
 end
 
 ```
 
-### Simulate IMU1
+### Generate IMU1 synthetic data 
 
 ```matlab
 
@@ -314,12 +339,12 @@ rng('shuffle')                  % Reset pseudo-random seed
 
 if strcmp(IMU1_DATA, 'ON')      % If simulation of IMU1 data is required ...
     
-    fprintf('NaveGo: generating IMU1 ACCR data... \n')
+    fprintf('NaveGo: generating IMU1 ACCR synthetic data... \n')
     
     fb = acc_gen (ref, imu1);   % Generate acc in the body frame
     imu1.fb = fb;
     
-    fprintf('NaveGo: generating IMU1 GYRO data... \n')
+    fprintf('NaveGo: generating IMU1 GYRO synthetic data... \n')
     
     wb = gyro_gen (ref, imu1);  % Generate gyro in the body frame
     imu1.wb = wb;
@@ -336,7 +361,7 @@ end
 
 ```
 
-### Simulate IMU2
+### Generate IMU2 synthetic data
 
 ```matlab
 
@@ -344,12 +369,12 @@ rng('shuffle')					% Reset pseudo-random seed
 
 if strcmp(IMU2_DATA, 'ON')      % If simulation of IMU2 data is required ...
     
-    fprintf('NaveGo: generating IMU2 ACCR data... \n')
+    fprintf('NaveGo: generating IMU2 ACCR synthetic data... \n')
     
     fb = acc_gen (ref, imu2);   % Generate acc in the body frame
     imu2.fb = fb;
     
-    fprintf('NaveGo: generating IMU2 GYRO data... \n')
+    fprintf('NaveGo: generating IMU2 GYRO synthetic data... \n')
     
     wb = gyro_gen (ref, imu2);  % Generate gyro in the body frame
     imu2.wb = wb;
@@ -376,130 +401,131 @@ fprintf('\nNaveGo: navigation time is %.2f minutes or %.2f seconds. \n', (to/60)
 
 ```
 
-### INS/GPS integration using IMU1
+### INS/GNSS integration using IMU1
 
 ```matlab
 
 if strcmp(IMU1_INS, 'ON')
     
-    fprintf('NaveGo: INS/GPS integration for IMU1... \n')
+    fprintf('NaveGo: INS/GNSS navigation estimates for IMU1... \n')
     
-    % Sincronize GPS data with IMU data.
+    % Sincronize GNSS data with IMU data.
     
-    % Guarantee that gps.t(1) < imu1.t(1) < gps.t(2)
-    if (imu1.t(1) < gps.t(1)),
+    % Guarantee that gnss.t(1) < imu1.t(1) < gnss.t(2)
+    if (imu1.t(1) < gnss.t(1))
         
-        igx  = find(imu1.t > gps.t(1), 1, 'first' );
+        igx  = find(imu1.t > gnss.t(1), 1, 'first' );
         
         imu1.t  = imu1.t  (igx:end, :);
         imu1.fb = imu1.fb (igx:end, :);
         imu1.wb = imu1.wb (igx:end, :);        
     end
     
-    % Guarantee that imu1.t(end-1) < gps.t(end) < imu1.t(end)
-    gps1 = gps;
-    if (imu1.t(end) <= gps.t(end)),
+    % Guarantee that imu1.t(end-1) < gnss.t(end) < imu1.t(end)
+    gnss1 = gnss;
+    
+    if (imu1.t(end) <= gnss.t(end))
         
-        fgx  = find(gps.t < imu1.t(end), 1, 'last' );
+        fgx  = find(gnss.t < imu1.t(end), 1, 'last' );
         
-        gps1.t   = gps.t  (1:fgx, :);
-        gps1.lat = gps.lat(1:fgx, :);
-        gps1.lon = gps.lon(1:fgx, :);
-        gps1.h   = gps.h  (1:fgx, :);
-        gps1.vel = gps.vel(1:fgx, :);
+        gnss1.t   = gnss.t  (1:fgx, :);
+        gnss1.lat = gnss.lat(1:fgx, :);
+        gnss1.lon = gnss.lon(1:fgx, :);
+        gnss1.h   = gnss.h  (1:fgx, :);
+        gnss1.vel = gnss.vel(1:fgx, :);
     end
     
-    % Execute INS/GPS integration
+    % Execute INS/GNSS integration
     % ---------------------------------------------------------------------
-    [imu1_e] = ins_gps(imu1, gps1, 'quaternion', 'double');
+    nav1_e = ins_gnss(imu1, gnss1, 'dcm');
     % ---------------------------------------------------------------------
     
-    save imu1_e.mat imu1_e
+    save nav1_e.mat nav1_e
     
 else
     
-    fprintf('NaveGo: loading INS/GPS integration for IMU1... \n')
+    fprintf('NaveGo: loading INS/GNSS integration for IMU1... \n')
     
-    load imu1_e.mat
+    load nav1_e.mat
 end
 
 ```
 
-### INS/GPS integration using IMU2
+### INS/GNSS integration using IMU2
 
 ```matlab
 
 if strcmp(IMU2_INS, 'ON')
     
-    fprintf('\nNaveGo: INS/GPS integration for IMU2... \n')
+    fprintf('NaveGo: INS/GNSS navigation estimates for IMU2... \n')
     
-    % Sincronize GPS data and IMU data.
+    % Sincronize GNSS data and IMU data.
     
-    % Guarantee that gps.t(1) < imu2.t(1) < gps.t(2)
-    if (imu2.t(1) < gps.t(1)),
+    % Guarantee that gnss.t(1) < imu2.t(1) < gnss.t(2)
+    if (imu2.t(1) < gnss.t(1))
         
-        igx  = find(imu2.t > gps.t(1), 1, 'first' );
+        igx  = find(imu2.t > gnss.t(1), 1, 'first' );
         
         imu2.t  = imu2.t  (igx:end, :);
         imu2.fb = imu2.fb (igx:end, :);
         imu2.wb = imu2.wb (igx:end, :);        
     end
     
-    % Guarantee that imu2.t(end-1) < gps.t(end) < imu2.t(end)
-    gps2 = gps;
-    if (imu2.t(end) <= gps.t(end)),
+    % Guarantee that imu2.t(end-1) < gnss.t(end) < imu2.t(end)
+    gnss2 = gnss;
+    
+    if (imu2.t(end) <= gnss.t(end))
         
-        fgx  = find(gps.t < imu2.t(end), 1, 'last' );
+        fgx  = find(gnss.t < imu2.t(end), 1, 'last' );
         
-        gps2.t   = gps.t  (1:fgx, :);
-        gps2.lat = gps.lat(1:fgx, :);
-        gps2.lon = gps.lon(1:fgx, :);
-        gps2.h   = gps.h  (1:fgx, :);
-        gps2.vel = gps.vel(1:fgx, :);       
+        gnss2.t   = gnss.t  (1:fgx, :);
+        gnss2.lat = gnss.lat(1:fgx, :);
+        gnss2.lon = gnss.lon(1:fgx, :);
+        gnss2.h   = gnss.h  (1:fgx, :);
+        gnss2.vel = gnss.vel(1:fgx, :);       
     end
     
-    % Execute INS/GPS integration
+    % Execute INS/GNSS integration
     % ---------------------------------------------------------------------
-    [imu2_e] = ins_gps(imu2, gps2, 'dcm', 'single');
+    nav2_e = ins_gnss(imu2, gnss2, 'quaternion');
     % ---------------------------------------------------------------------
     
-    save imu2_e.mat imu2_e
+    save nav2_e.mat nav2_e
     
 else
     
-    fprintf('NaveGo: loading INS/GPS integration for IMU2... \n')
+    fprintf('NaveGo: loading INS/GNSS integration for IMU2... \n')
     
-    load imu2_e.mat
+    load nav2_e.mat
 end
 
 ```
 
-### Interpolate reference dataset 
+### Interpolate INS/GNSS dataset 
 
 ```matlab
 
-% INS/GPS estimates and GPS data are interpolated according to the
+% INS/GNSS estimates and GNSS data are interpolated according to the
 % reference dataset.
 
-[imu1_ref, ref_1] = navego_interpolation (imu1_e, ref);
-[imu2_ref, ref_2] = navego_interpolation (imu2_e, ref);
-[gps_ref, ref_g]  = navego_interpolation (gps, ref);
-
+[nav1_ref, ref_1] = navego_interpolation (nav1_e, ref);
+[nav2_ref, ref_2] = navego_interpolation (nav2_e, ref);
+[gnss_ref, ref_g] = navego_interpolation (gnss, ref);
 ```
 
-### Print RMSE from IMU1
+### Print on console RMSE from IMU1
 
 ```matlab
 
-print_rmse (imu1_ref, gps_ref, ref_1, ref_g, 'INS/GPS IMU1');
+print_rmse (nav1_ref, gnss_ref, ref_1, ref_g, 'INS/GNSS IMU1');
 
 ```
 
-### Print RMSE from IMU2
+### Print on console RMSE from IMU2
 
 ```matlab
 
-print_rmse (imu2_ref, gps_ref, ref_2, ref_g, 'INS/GPS IMU2');
+print_rmse (nav2_ref, gnss_ref, ref_2, ref_g, 'INS/GNSS IMU2');
 
 ```
 
